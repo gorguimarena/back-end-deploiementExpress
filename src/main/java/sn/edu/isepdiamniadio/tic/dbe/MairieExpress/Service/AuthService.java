@@ -2,6 +2,14 @@ package sn.edu.isepdiamniadio.tic.dbe.MairieExpress.Service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.ws.rs.client.Client;
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.client.Entity;
+import jakarta.ws.rs.core.Form;
+import jakarta.ws.rs.core.Response;
+import org.keycloak.OAuth2Constants;
+import org.keycloak.admin.client.Keycloak;
+import org.keycloak.admin.client.KeycloakBuilder;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -75,8 +83,7 @@ public class AuthService {
 
     }
 
-
-    //methode pour se deconnecter
+    /*//methode pour se deconnecter
     public ResponseEntity<Map<String,Object>> logout(String refresh_token) {
         String url = String.format("%s/realms/%s/protocol/openid-connect/logout", authServerUrl, realm);
 
@@ -106,7 +113,7 @@ public class AuthService {
 
     // Méthode pour créer un utilisateur avec un mot de passe
     public ResponseEntity<Map<String, Object>> createUser(String username, String email, String password,String tokenAdmin) {
-        String url = String.format("%s/admin/realms/%s/users", authServerUrl, realm);
+        String url = String.format("%s/realms/%s/clients-registrations/openid-connect", authServerUrl, realm);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(tokenAdmin);
@@ -141,7 +148,7 @@ public class AuthService {
             repons.put("status",HttpStatus.INTERNAL_SERVER_ERROR);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(repons);
         }
-    }
+    }*/
 }
 
 

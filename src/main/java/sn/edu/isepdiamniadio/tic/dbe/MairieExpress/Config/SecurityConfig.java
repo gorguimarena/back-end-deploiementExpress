@@ -20,7 +20,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import java.util.Collections;
 
 
-/*@RequiredArgsConstructor
+@RequiredArgsConstructor
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -28,15 +28,14 @@ public class SecurityConfig {
     public static final String ADMIN = "admin";
     public static final String USER = "user";
 
-    private final JwtConverter jwtConverter;
+   private final JwtConverter jwtConverter;
 
     // Configuration principale de Spring Security
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
-        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwtConverter);
 
-        http.csrf(AbstractHttpConfigurer::disable)
+
+        http.csrf(cr->cr.disable())
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers("/api/token").permitAll()
                         .requestMatchers("/api/logout").permitAll()
@@ -59,7 +58,8 @@ public class SecurityConfig {
     public HttpHeaders httpHeaders() {
         return new HttpHeaders();
     }
-}*/
+}
+/*
 
 @RequiredArgsConstructor
 @Configuration
@@ -120,3 +120,4 @@ public class SecurityConfig {
         return new HttpHeaders();
     }
 }
+*/

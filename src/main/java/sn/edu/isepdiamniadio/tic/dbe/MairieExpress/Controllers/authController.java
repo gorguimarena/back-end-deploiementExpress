@@ -26,8 +26,8 @@ public class authController {
         return authService.authenticate(requestAuth.getUsername(), requestAuth.getPassword());
     }
 
-    @PostMapping("logout")
+    /*@PostMapping("logout")
     public ResponseEntity<Map<String, Object>> logout(@RequestBody RequestLogout requestLogout) {
         return authService.logout(requestLogout.getToken());
-    }
+    }*/
 }

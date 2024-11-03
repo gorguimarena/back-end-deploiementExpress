@@ -23,14 +23,5 @@ public class RegisterController {
     @Autowired
     private KeycloakService keycloakService;
 
-    @PostMapping("register")
-    public ResponseEntity<Map<String,Object>> registerUser(@RequestBody RequestRegister register){
-        return authService.createUser(register.getName(),register.getPassword(),register.getEmail(),register.getPhone());
-    }
-
-    @PostMapping("infos")
-    public ResponseEntity<String> registerUserInfo(@RequestBody String token){
-       return keycloakService.getUser(token);
-    }
 
 }
