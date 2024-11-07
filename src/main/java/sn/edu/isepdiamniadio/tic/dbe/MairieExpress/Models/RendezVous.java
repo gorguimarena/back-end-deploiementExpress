@@ -3,21 +3,26 @@ package sn.edu.isepdiamniadio.tic.dbe.MairieExpress.Models;
 import jakarta.persistence.*;
 import lombok.*;
 
-@Setter
-@Getter
+import java.util.Date;
+
 @Entity
 @Builder
-@AllArgsConstructor
 @NoArgsConstructor
-public class Compte {
+@AllArgsConstructor
+@Getter
+@Setter
+public class RendezVous {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Integer id;
 
     @Column(nullable = false)
-    private String email;
+    private Date date;
 
     @Column(nullable = false)
-    private String mot_de_passe;
+    private String motif;
+
+    @ManyToOne
+    private Citoyen citoyen;
 }

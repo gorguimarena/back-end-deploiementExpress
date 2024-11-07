@@ -1,5 +1,6 @@
 package sn.edu.isepdiamniadio.tic.dbe.MairieExpress.Config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
@@ -17,6 +18,8 @@ import java.util.stream.Stream;
 @Component
 public class JwtConverter implements Converter<Jwt, Collection<GrantedAuthority>> {
 
+    @Value("${jwt.auth.converter.resource-id}")
+    private String clientId ;
 
     @Override
     public Collection<GrantedAuthority> convert(Jwt source) {
@@ -25,7 +28,7 @@ public class JwtConverter implements Converter<Jwt, Collection<GrantedAuthority>
         if (resourceAccess == null || resourceAccess.isEmpty()) {
             return new  ArrayList<>();
         }
-        Map<String,Object> roles = (Map<String, Object>) resourceAccess.get("customer1");
+        Map<String,Object> roles = (Map<String, Object>) resourceAccess.get(clientId);
 
         Collection<GrantedAuthority> authorities = ((List<String>) roles.get("roles"))
                 .stream().map(roleName -> "ROLE_"+roleName)

@@ -1,4 +1,7 @@
 package sn.edu.isepdiamniadio.tic.dbe.MairieExpress.Models;
 
-public class CopieLitteralActeNaissance {
+import jakarta.persistence.Entity;
+
+@Entity
+public class CopieLitteralActeNaissance extends ActeNaissance{
 }

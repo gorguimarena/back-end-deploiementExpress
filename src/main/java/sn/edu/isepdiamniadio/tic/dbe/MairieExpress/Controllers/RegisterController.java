@@ -23,5 +23,11 @@ public class RegisterController {
     @Autowired
     private KeycloakService keycloakService;
 
+    @PostMapping
+    public ResponseEntity<?> register(@RequestBody RequestRegister r){
+        return keycloakService.creerUser(r.getEmail(),r.getPassword(),r.getNom(),r.getPrenom(),r.getUsername(),r.getRole());
+    }
+
+
 
 }

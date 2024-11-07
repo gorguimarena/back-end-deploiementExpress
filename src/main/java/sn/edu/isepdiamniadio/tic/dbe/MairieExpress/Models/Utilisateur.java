@@ -17,6 +17,15 @@ public class Utilisateur {
     @Column(name = "id", nullable = false)
     private Integer id;
 
+    @Column(nullable = false)
     private String nom;
+
+    @Column(nullable = false)
     private String prenom;
+
+    @Column(nullable = false)
+    private String username;
+
+    @Column(nullable = false)
+    private String email;
 }

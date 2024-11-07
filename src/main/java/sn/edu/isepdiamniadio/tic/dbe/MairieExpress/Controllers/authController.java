@@ -21,13 +21,8 @@ public class authController {
     @Autowired
     private AuthService authService;
 
-    @PostMapping("token")
+    @PostMapping("auth")
     public ResponseEntity<Map<String, Object>> login(@RequestBody RequestAuth requestAuth) {
         return authService.authenticate(requestAuth.getUsername(), requestAuth.getPassword());
     }
-
-    /*@PostMapping("logout")
-    public ResponseEntity<Map<String, Object>> logout(@RequestBody RequestLogout requestLogout) {
-        return authService.logout(requestLogout.getToken());
-    }*/
 }

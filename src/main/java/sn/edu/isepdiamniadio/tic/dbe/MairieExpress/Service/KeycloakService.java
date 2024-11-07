@@ -1,13 +1,16 @@
 package sn.edu.isepdiamniadio.tic.dbe.MairieExpress.Service;
 
 
+import jakarta.ws.rs.core.Response;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.KeycloakBuilder;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.admin.client.resource.UsersResource;
 import org.keycloak.representations.idm.CredentialRepresentation;
+import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -19,25 +22,20 @@ import java.util.Map;
 @Service
 public class KeycloakService {
 
-
-    private static String serverUrl = "http://localhost:8080";
-
-    private String realm = "myRealm";
+    @Value("${keycloak.auth-server-url}")
+    private static String serverUrl;
 
 
-    private String clientId = "customer1";
+    @Value("${keycloak.realm}")
+    private String realm;
 
-
-    private String clientSecret = "phlyQlUqDQeTaKtwVYeUpm2ntOavZxWo";
-
-    private String grantType = "client_credentials";
 
     @Autowired
     private RestTemplate restTemplate;
 
     public static Keycloak connectKeycloak(){
         return KeycloakBuilder.builder()
-                .serverUrl(serverUrl)
+                .serverUrl(serverUrl+"/auth")
                 .realm("master")
                 .username("admin")
                 .password("admin")
@@ -46,41 +44,42 @@ public class KeycloakService {
     }
 
 
-    public UserRepresentation user(String username, String password) {
+    public ResponseEntity<UserRepresentation> user(String username) {
         Keycloak keycloak = KeycloakService.connectKeycloak();
 
         RealmResource realmResource = keycloak.realm(realm);
         UsersResource usersResource = realmResource.users();
-
 
         List<UserRepresentation> users = usersResource.search(username, 0, 1);
 
         if (!users.isEmpty()) {
-            return users.getFirst();
+            return ResponseEntity.ok(users.getFirst());
         }
-
-        return null;
+        return ResponseEntity.notFound().build();
     }
 
-    public ResponseEntity<?> creerUser(String email, String password,String username){
+    public ResponseEntity<?> creerUser(String email, String password, String nom, String prenom, String username, String role) {
 
-        // Connexion à Keycloak
         Keycloak keycloak = KeycloakService.connectKeycloak();
 
-        if (usernameExist(keycloak, username) || emailExists(keycloak, email)){
-            return ResponseEntity.status(HttpStatus.ALREADY_REPORTED).body("Username existe");
+        if (usernameExist(keycloak, username)) {
+            return ResponseEntity.status(HttpStatus.ALREADY_REPORTED).body("Ce nom d'utilisateur existe déjà");
         }
-        // Obtenir le Realm
+        if (emailExists(keycloak, email)) {
+            return ResponseEntity.status(HttpStatus.ALREADY_REPORTED).body("Ce mail existe déjà");
+        }
+
         RealmResource realmResource = keycloak.realm(realm);
         UsersResource usersResource = realmResource.users();
 
-        // Créer l'utilisateur
         UserRepresentation user = new UserRepresentation();
         user.setUsername(username);
+        user.setEmail(email);
+        user.setFirstName(nom);
+        user.setLastName(prenom);
         user.setEnabled(true);
         user.setEmail(email);
 
-        // Ajouter des informations d'identification
         CredentialRepresentation credential = new CredentialRepresentation();
         credential.setTemporary(false);
         credential.setType(CredentialRepresentation.PASSWORD);
@@ -88,9 +87,24 @@ public class KeycloakService {
 
         user.setCredentials(Collections.singletonList(credential));
 
-        usersResource.create(user);
-        return ResponseEntity.status(HttpStatus.CREATED).body("User created");
+        // Création de l'utilisateur
+        Response response = usersResource.create(user);
+        if (response.getStatus() != 201) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erreur lors de la création de l'utilisateur");
+        }
+
+        // Récupération de l'ID de l'utilisateur
+        String userId = response.getLocation().getPath().replaceAll(".*/([^/]+)$", "$1");
+
+        // Récupération du rôle à partir du realm
+        RoleRepresentation roleRepresentation = realmResource.roles().get(role).toRepresentation();
+
+        // Attribution du rôle à l'utilisateur
+        usersResource.get(userId).roles().realmLevel().add(Collections.singletonList(roleRepresentation));
+
+        return ResponseEntity.status(HttpStatus.CREATED).body("User created with role " + role);
     }
+
 
 
     public  boolean usernameExist(Keycloak keycloak, String username) {

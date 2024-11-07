@@ -1,13 +1,20 @@
 package sn.edu.isepdiamniadio.tic.dbe.MairieExpress.Models;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.DiscriminatorValue;
-import jakarta.persistence.Entity;
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.util.List;
 
 @Entity
-@DiscriminatorValue("Agent")
+@DiscriminatorValue("AGENT")
+@Getter
+@Setter
 public class Agent extends Utilisateur{
 
-    @Column(nullable = false)
-    private String fonction;
+    @ManyToMany
+    private List<Demande> demandes;
+
+    @ManyToOne
+    private Mairie mairie;
 }

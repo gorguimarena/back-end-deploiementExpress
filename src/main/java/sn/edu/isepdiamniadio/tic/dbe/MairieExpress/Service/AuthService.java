@@ -10,9 +10,11 @@ import jakarta.ws.rs.core.Response;
 import org.keycloak.OAuth2Constants;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.KeycloakBuilder;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.dto.UserToken;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -21,17 +23,22 @@ import java.util.Map;
 @Service
 public class AuthService {
 
-    private final String authServerUrl = "http://localhost:8080";
+
+    @Value("${keycloak.auth-server-url}")
+    private String authServerUrl;
 
 
-    private final String realm = "myRealm";
+    @Value("${keycloak.realm}")
+    private String realm;
 
 
-    private String clientId = "customer1";
+    @Value("${jwt.auth.converter.resource-id}")
+    private String clientId ;
 
     private final Map<String,Object> repons = new HashMap<>();
 
-    private String clientSecret = "phlyQlUqDQeTaKtwVYeUpm2ntOavZxWo";
+    @Value("${keycloak.credentials.secret}")
+    private String clientSecret;
 
 
     private final RestTemplate restTemplate = new RestTemplate();
@@ -49,9 +56,7 @@ public class AuthService {
 
         String body = String.format("grant_type=password&client_id=%s&username=%s&password=%s&client_secret=%s",
                 clientId, username, password, clientSecret);
-
         HttpEntity<String> entity = new HttpEntity<>(body, headers);
-
 
         try {
             ResponseEntity<String> response = restTemplate.postForEntity(url, entity, String.class);
@@ -83,7 +88,8 @@ public class AuthService {
 
     }
 
-    /*//methode pour se deconnecter
+
+    //methode pour se deconnecter
     public ResponseEntity<Map<String,Object>> logout(String refresh_token) {
         String url = String.format("%s/realms/%s/protocol/openid-connect/logout", authServerUrl, realm);
 
@@ -111,44 +117,6 @@ public class AuthService {
         }
     }
 
-    // Méthode pour créer un utilisateur avec un mot de passe
-    public ResponseEntity<Map<String, Object>> createUser(String username, String email, String password,String tokenAdmin) {
-        String url = String.format("%s/realms/%s/clients-registrations/openid-connect", authServerUrl, realm);
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(tokenAdmin);
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
-        Map<String, Object> user = new HashMap<>();
-        user.put("username", username);
-        user.put("email", email);
-        user.put("client_id",clientSecret);
-        user.put("enabled", true);
-
-        Map<String, Object> credentials = new HashMap<>();
-        credentials.put("type", "password");
-        credentials.put("value", password);
-        credentials.put("temporary", false);
-
-        user.put("credentials", Collections.singletonList(credentials));
-
-        HttpEntity<Map<String, Object>> entity = new HttpEntity<>(user, headers);
-
-        try {
-            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
-            if (response.getStatusCode() == HttpStatus.CREATED) {
-                repons.put("reponse","Creation du user fait avec succee");
-                return ResponseEntity.status(HttpStatus.CREATED).body(repons);
-            } else {
-                repons.put("reponse","failed");
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(repons);
-            }
-        } catch (Exception e) {
-            repons.put("reponse","failed to create user");
-            repons.put("status",HttpStatus.INTERNAL_SERVER_ERROR);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(repons);
-        }
-    }*/
 }
 
 

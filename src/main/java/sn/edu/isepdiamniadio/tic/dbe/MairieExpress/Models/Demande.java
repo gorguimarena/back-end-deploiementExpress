@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Getter
@@ -19,9 +20,16 @@ public class Demande {
 
     private Date date_demande;
 
+
     private String status_demande;
 
     @ManyToOne
     private Citoyen citoyen;
+
+    @ManyToMany
+    private List<Document> document;
+
+    @ManyToMany
+    private List<Agent> agents;
 
 }
