@@ -1,21 +1,25 @@
 package sn.edu.isepdiamniadio.tic.dbe.MairieExpress.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 
 @Getter
 public class RequestRegister {
-    private final String email;
-    private final String password;
-    private final String nom;
-    private final String prenom;
-    private final String username;
-    private final String role;
-    public RequestRegister(String email, String password, String nom, String prenom, String username,String role) {
-        this.email = email;
-        this.password = password;
-        this.nom = nom;
-        this.prenom = prenom;
-        this.username = username;
-        this.role = role;
-    }
+    @JsonProperty("email")
+    private String email;
+
+    @JsonProperty("password")
+    private String password;
+
+    @JsonProperty("nom")
+    private String nom;
+
+    @JsonProperty("prenom")
+    private String prenom;
+
+    @JsonProperty("username")
+    private String username;
+
+    @JsonProperty("role")
+    private String role;
 }

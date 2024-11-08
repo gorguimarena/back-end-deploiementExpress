@@ -2,6 +2,8 @@ package sn.edu.isepdiamniadio.tic.dbe.MairieExpress.Config;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.keycloak.admin.client.Keycloak;
+import org.keycloak.admin.client.KeycloakBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
@@ -25,8 +27,12 @@ import java.util.Collections;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    public static final String ADMIN = "admin";
-    public static final String USER = "user";
+
+    public static final String CITOYEN = "citoyen";
+    private static final String OFFICIER = "officier";
+    private static final String ADMINSYSTEME = "adminSystem";
+    private static final String ADMINMAIRIE = "adminMairie";
+    private static final String AGENT = "agent";
 
     private final JwtConverter jwtConverter;
 
@@ -43,7 +49,7 @@ public class SecurityConfig {
                             public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
                                 CorsConfiguration config = new CorsConfiguration();
                                 config.setAllowCredentials(true);
-                                config.setAllowedOrigins(Collections.singletonList("http://localhost:4200"));
+                                config.setAllowedOrigins(Collections.singletonList("*"));
                                 config.setAllowedHeaders(Collections.singletonList("*"));
                                 config.setAllowedMethods(Collections.singletonList("*"));
                                 config.setExposedHeaders(Collections.singletonList("Authorization"));
@@ -52,16 +58,16 @@ public class SecurityConfig {
                             }
                         }));
 
-        http.csrf(crsf->crsf.csrfTokenRequestHandler(csrfTokenRequestAttributeHandler)
-                        .ignoringRequestMatchers("auth","register")
-                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()
-                        )
-                )
+        http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authz -> authz
-                        .requestMatchers("/api/token").permitAll()
+                        .requestMatchers(HttpMethod.POST,"/api/auth").permitAll()
                         .requestMatchers("/api/logout").permitAll()
-                        .requestMatchers("/api/admin/**").hasRole(ADMIN)
-                        .requestMatchers("/api/user/**").hasRole(USER)
+                        .requestMatchers("/api/adminsystem/**").hasRole(ADMINSYSTEME)
+                        .requestMatchers("/api/adminmairie/**").hasRole(ADMINMAIRIE)
+                        .requestMatchers("/api/agent/**").hasRole(AGENT)
+                        .requestMatchers("/api/officier/**").hasRole(OFFICIER)
+                        .requestMatchers("/api/citoyen/**").hasRole(CITOYEN)
+                        .requestMatchers("/api/user/**").hasAnyRole(CITOYEN, ADMINSYSTEME,ADMINMAIRIE,AGENT,OFFICIER)
                         .anyRequest().authenticated());
 
         http.oauth2ResourceServer(rsc->rsc.jwt(jwtConfigurer -> jwtConfigurer.jwtAuthenticationConverter(jwtAuthenticationConverter)));

@@ -15,13 +15,13 @@ import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.dto.RequestLogout;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/")
+@RequestMapping("/api/auth")
 public class authController {
 
     @Autowired
     private AuthService authService;
 
-    @PostMapping("auth")
+    @PostMapping
     public ResponseEntity<Map<String, Object>> login(@RequestBody RequestAuth requestAuth) {
         return authService.authenticate(requestAuth.getUsername(), requestAuth.getPassword());
     }

@@ -1,5 +1,6 @@
 package sn.edu.isepdiamniadio.tic.dbe.MairieExpress.Controllers;
 
+import jakarta.ws.rs.core.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,9 +24,9 @@ public class RegisterController {
     @Autowired
     private KeycloakService keycloakService;
 
-    @PostMapping
-    public ResponseEntity<?> register(@RequestBody RequestRegister r){
-        return keycloakService.creerUser(r.getEmail(),r.getPassword(),r.getNom(),r.getPrenom(),r.getUsername(),r.getRole());
+    @PostMapping("registe")
+    public void register(@RequestBody RequestRegister r){
+        keycloakService.creerUser(r.getUsername(),r.getPassword(),r.getPrenom(),r.getNom(),r.getEmail(),r.getRole());
     }
 
 

@@ -23,14 +23,14 @@ public class JwtConverter implements Converter<Jwt, Collection<GrantedAuthority>
 
     @Override
     public Collection<GrantedAuthority> convert(Jwt source) {
-        Map<String, Object> resourceAccess = source.getClaim("resource_access");
+        Map<String, Object> resourceAccess = source.getClaim("realm_access");
 
         if (resourceAccess == null || resourceAccess.isEmpty()) {
             return new  ArrayList<>();
         }
-        Map<String,Object> roles = (Map<String, Object>) resourceAccess.get(clientId);
+        //Map<String,Object> roles = (Map<String, Object>) resourceAccess.get(clientId);
 
-        Collection<GrantedAuthority> authorities = ((List<String>) roles.get("roles"))
+        Collection<GrantedAuthority> authorities = ((List<String>) resourceAccess.get("roles"))
                 .stream().map(roleName -> "ROLE_"+roleName)
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());

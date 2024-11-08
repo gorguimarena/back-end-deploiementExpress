@@ -17,14 +17,9 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class KeycloakService {
-
-    @Value("${keycloak.auth-server-url}")
-    private static String serverUrl;
-
 
     @Value("${keycloak.realm}")
     private String realm;
@@ -35,7 +30,7 @@ public class KeycloakService {
 
     public static Keycloak connectKeycloak(){
         return KeycloakBuilder.builder()
-                .serverUrl(serverUrl+"/auth")
+                .serverUrl("http://localhost:8080")
                 .realm("master")
                 .username("admin")
                 .password("admin")
@@ -44,42 +39,59 @@ public class KeycloakService {
     }
 
 
-    public ResponseEntity<UserRepresentation> user(String username) {
+    public ResponseEntity<?> user(String username) {
         Keycloak keycloak = KeycloakService.connectKeycloak();
 
         RealmResource realmResource = keycloak.realm(realm);
         UsersResource usersResource = realmResource.users();
 
-        List<UserRepresentation> users = usersResource.search(username, 0, 1);
+        try {
+            List<UserRepresentation> users = usersResource.search(username, 0, 1);
+            System.out.println("Résultat de la recherche utilisateur : " + users);
 
-        if (!users.isEmpty()) {
-            return ResponseEntity.ok(users.getFirst());
+            if (!users.isEmpty()) {
+                return ResponseEntity.ok(users.getFirst());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Erreur interne : " + e.getMessage());
         }
+
+
         return ResponseEntity.notFound().build();
     }
 
-    public ResponseEntity<?> creerUser(String email, String password, String nom, String prenom, String username, String role) {
 
-        Keycloak keycloak = KeycloakService.connectKeycloak();
+    public ResponseEntity<?> creerUser(String username, String password, String prenom, String nom, String email, String role){
+
+
+        // Connexion à Keycloak
+        Keycloak keycloak = connectKeycloak();
+
+
+        // Obtenir le Realm
+        RealmResource realmResource = keycloak.realm("MairieExpress");
+        UsersResource usersResource = realmResource.users();
 
         if (usernameExist(keycloak, username)) {
             return ResponseEntity.status(HttpStatus.ALREADY_REPORTED).body("Ce nom d'utilisateur existe déjà");
         }
+        // Obtenir le Realm
         if (emailExists(keycloak, email)) {
             return ResponseEntity.status(HttpStatus.ALREADY_REPORTED).body("Ce mail existe déjà");
         }
 
-        RealmResource realmResource = keycloak.realm(realm);
-        UsersResource usersResource = realmResource.users();
 
+        // Créer l'utilisateur
         UserRepresentation user = new UserRepresentation();
         user.setUsername(username);
-        user.setEmail(email);
         user.setFirstName(nom);
         user.setLastName(prenom);
         user.setEnabled(true);
         user.setEmail(email);
 
+        // Ajouter des informations d'identification
         CredentialRepresentation credential = new CredentialRepresentation();
         credential.setTemporary(false);
         credential.setType(CredentialRepresentation.PASSWORD);
@@ -87,8 +99,8 @@ public class KeycloakService {
 
         user.setCredentials(Collections.singletonList(credential));
 
-        // Création de l'utilisateur
-        Response response = usersResource.create(user);
+       Response response = usersResource.create(user);
+
         if (response.getStatus() != 201) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erreur lors de la création de l'utilisateur");
         }
@@ -102,7 +114,8 @@ public class KeycloakService {
         // Attribution du rôle à l'utilisateur
         usersResource.get(userId).roles().realmLevel().add(Collections.singletonList(roleRepresentation));
 
-        return ResponseEntity.status(HttpStatus.CREATED).body("User created with role " + role);
+        return ResponseEntity.status(HttpStatus.CREATED).body("User created with role ");
+
     }
 
 
