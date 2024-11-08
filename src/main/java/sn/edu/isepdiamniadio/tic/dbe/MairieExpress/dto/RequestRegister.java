@@ -2,9 +2,11 @@ package sn.edu.isepdiamniadio.tic.dbe.MairieExpress.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
+import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.Config.PasswordGenerator;
 
 @Getter
 public class RequestRegister {
+
     @JsonProperty("email")
     private String email;
 

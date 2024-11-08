@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.Collections;
 import java.util.List;
@@ -24,9 +23,8 @@ public class KeycloakService {
     @Value("${keycloak.realm}")
     private String realm;
 
-
     @Autowired
-    private RestTemplate restTemplate;
+    private EmailService emailService;
 
     public static Keycloak connectKeycloak(){
         return KeycloakBuilder.builder()
@@ -63,7 +61,7 @@ public class KeycloakService {
     }
 
 
-    public ResponseEntity<?> creerUser(String username, String password, String prenom, String nom, String email, String role){
+    public ResponseEntity<?> creerUser(String username,String password, String prenom, String nom, String email, String role){
 
         // Connexion à Keycloak
         Keycloak keycloak = connectKeycloak();
@@ -111,6 +109,10 @@ public class KeycloakService {
 
         // Attribution du rôle à l'utilisateur
         usersResource.get(userId).roles().realmLevel().add(Collections.singletonList(roleRepresentation));
+
+        String message = String.format("Votre compte a ete creer avec le mot de passe : %s",password);
+
+        emailService.sendEmail(email,"Compte cree",message);
 
         return ResponseEntity.status(HttpStatus.CREATED).body("User created with role ");
 

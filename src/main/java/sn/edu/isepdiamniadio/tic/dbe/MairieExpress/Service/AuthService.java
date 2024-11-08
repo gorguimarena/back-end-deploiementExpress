@@ -10,14 +10,20 @@ import jakarta.ws.rs.core.Response;
 import org.keycloak.OAuth2Constants;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.KeycloakBuilder;
+import org.keycloak.admin.client.resource.RealmResource;
+import org.keycloak.admin.client.resource.UsersResource;
+import org.keycloak.representations.idm.UserRepresentation;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.dto.UserToken;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -28,10 +34,6 @@ public class AuthService {
     private String authServerUrl;
 
 
-    @Value("${keycloak.realm}")
-    private String realm;
-
-
     @Value("${jwt.auth.converter.resource-id}")
     private String clientId ;
 
@@ -40,6 +42,11 @@ public class AuthService {
     @Value("${keycloak.credentials.secret}")
     private String clientSecret;
 
+    @Value("${keycloak.realm}")
+    private String realm;
+
+    @Autowired
+    private KeycloakService keycloakService;
 
     private final RestTemplate restTemplate = new RestTemplate();
 
@@ -50,7 +57,7 @@ public class AuthService {
 
     //methode pour se connecter
     public ResponseEntity<Map<String,Object>> authenticate(String username, String password) {
-        String url = String.format("%s/realms/%s/protocol/openid-connect/token", authServerUrl, realm);
+        String url = String.format("%s/protocol/openid-connect/token", authServerUrl);
 
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
@@ -89,9 +96,9 @@ public class AuthService {
     }
 
 
-    //methode pour se deconnecter
+   /* //methode pour se deconnecter
     public ResponseEntity<Map<String,Object>> logout(String refresh_token) {
-        String url = String.format("%s/realms/%s/protocol/openid-connect/logout", authServerUrl, realm);
+        String url = String.format("%s/protocol/openid-connect/logout", authServerUrl);
 
         headers.setBearerAuth(refresh_token);
 
@@ -115,7 +122,25 @@ public class AuthService {
             repons.put("response","failed to logout");
             return ResponseEntity.ok().body(repons);
         }
-    }
+    }*/
+   public ResponseEntity<String> logoutUser(String username) {
+       try {
+           Keycloak keycloak = KeycloakService.connectKeycloak();
+           UsersResource usersResource = keycloak.realm(realm).users();
+
+           List<UserRepresentation> userRepresentation = usersResource.search(username,0,1);
+
+           if (userRepresentation.isEmpty()) {
+               return ResponseEntity.badRequest().body("Utilisateur non trouvé");
+           }
+
+           String sessionId = userRepresentation.getFirst().getId();
+           usersResource.get(sessionId).logout();
+           return ResponseEntity.ok("Déconnexion réussie");
+       } catch (Exception e) {
+           return ResponseEntity.status(500).body("Erreur lors de la déconnexion");
+       }
+   }
 
 }
 

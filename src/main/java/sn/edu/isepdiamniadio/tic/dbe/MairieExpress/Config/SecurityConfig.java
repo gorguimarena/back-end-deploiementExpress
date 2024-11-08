@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -49,7 +50,7 @@ public class SecurityConfig {
                             public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
                                 CorsConfiguration config = new CorsConfiguration();
                                 config.setAllowCredentials(true);
-                                config.setAllowedOrigins(Collections.singletonList("*"));
+                                config.setAllowedOrigins(Collections.singletonList("http://locahost:4200"));
                                 config.setAllowedHeaders(Collections.singletonList("*"));
                                 config.setAllowedMethods(Collections.singletonList("*"));
                                 config.setExposedHeaders(Collections.singletonList("Authorization"));
@@ -60,14 +61,15 @@ public class SecurityConfig {
 
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authz -> authz
-                        .requestMatchers(HttpMethod.POST,"/api/auth").permitAll()
+                        .requestMatchers("/api/auth").permitAll()
+                        .requestMatchers(HttpMethod.POST,"/api/registe").permitAll()
                         .requestMatchers("/api/logout").permitAll()
                         .requestMatchers("/api/adminsystem/**").hasRole(ADMINSYSTEME)
                         .requestMatchers("/api/adminmairie/**").hasRole(ADMINMAIRIE)
                         .requestMatchers("/api/agent/**").hasRole(AGENT)
                         .requestMatchers("/api/officier/**").hasRole(OFFICIER)
                         .requestMatchers("/api/citoyen/**").hasRole(CITOYEN)
-                        .requestMatchers("/api/user/**").hasAnyRole(CITOYEN, ADMINSYSTEME,ADMINMAIRIE,AGENT,OFFICIER)
+                        .requestMatchers("/api/user/**").hasAnyRole(ADMINSYSTEME,ADMINMAIRIE)
                         .anyRequest().authenticated());
 
         http.oauth2ResourceServer(rsc->rsc.jwt(jwtConfigurer -> jwtConfigurer.jwtAuthenticationConverter(jwtAuthenticationConverter)));
@@ -83,4 +85,5 @@ public class SecurityConfig {
     public HttpHeaders httpHeaders() {
         return new HttpHeaders();
     }
+
 }
