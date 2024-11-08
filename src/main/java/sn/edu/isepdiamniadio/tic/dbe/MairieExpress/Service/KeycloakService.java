@@ -65,20 +65,18 @@ public class KeycloakService {
 
     public ResponseEntity<?> creerUser(String username, String password, String prenom, String nom, String email, String role){
 
-
         // Connexion à Keycloak
         Keycloak keycloak = connectKeycloak();
-
 
         // Obtenir le Realm
         RealmResource realmResource = keycloak.realm("MairieExpress");
         UsersResource usersResource = realmResource.users();
 
-        if (usernameExist(keycloak, username)) {
+        if (usernameExist(usersResource, username)) {
             return ResponseEntity.status(HttpStatus.ALREADY_REPORTED).body("Ce nom d'utilisateur existe déjà");
         }
         // Obtenir le Realm
-        if (emailExists(keycloak, email)) {
+        if (emailExists(usersResource, email)) {
             return ResponseEntity.status(HttpStatus.ALREADY_REPORTED).body("Ce mail existe déjà");
         }
 
@@ -120,19 +118,13 @@ public class KeycloakService {
 
 
 
-    public  boolean usernameExist(Keycloak keycloak, String username) {
-        RealmResource realmResource = keycloak.realm(realm);
-        UsersResource usersResource = realmResource.users();
-
+    public  boolean usernameExist(UsersResource usersResource, String username) {
         // Rechercher par username
         List<UserRepresentation> usersByUsername = usersResource.search(username, 0, 1);
         return !usersByUsername.isEmpty();
 
     }
-    public boolean emailExists(Keycloak keycloak, String email) {
-        RealmResource realmResource = keycloak.realm(realm);
-        UsersResource usersResource = realmResource.users();
-
+    public boolean emailExists(UsersResource usersResource, String email) {
         // Rechercher par email
         List<UserRepresentation> usersByEmail = usersResource.search(null, null, null, email, 0, 1);
         return !usersByEmail.isEmpty();
