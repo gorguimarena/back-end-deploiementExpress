@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.Service.KeycloakService;
+import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.dto.CitoyenDto;
 import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.dto.RequestRegister;
 
 @RestController
@@ -17,7 +18,7 @@ public class CitoyenController {
     private KeycloakService keycloakService;
 
     @PostMapping("registe")
-    public ResponseEntity<?> registerCitoyen(@RequestBody RequestRegister r) {
-        return keycloakService.creerUser(r.getUsername(),r.getPassword(),r.getPrenom(),r.getNom(),r.getEmail(),r.getRole());
+    public ResponseEntity<?> registerCitoyen(@RequestBody CitoyenDto r) {
+        return keycloakService.createUserKeycloak(r.getEmail(),r.getPassword(),r.getNom(),r.getPrenom(),r.getRole(),r.getUsername());
     }
 }

@@ -20,10 +20,10 @@ public class authController {
 
     @PostMapping("auth")
     public ResponseEntity<Map<String, Object>> login(@RequestBody RequestAuth requestAuth) {
-        return authService.authenticate(requestAuth.getUsername(), requestAuth.getPassword());
+        return authService.authenticateUser(requestAuth.getUsername(), requestAuth.getPassword());
     }
-    @GetMapping("logout/{username}")
-    public ResponseEntity<?> logout(@PathVariable String username) {
-        return authService.logoutUser(username);
+    @GetMapping("logout/{id}")
+    public ResponseEntity<?> logout(@PathVariable Integer id) {
+        return authService.logoutUser(id);
     }
 }

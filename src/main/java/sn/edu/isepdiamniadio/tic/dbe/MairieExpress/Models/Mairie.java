@@ -1,5 +1,6 @@
 package sn.edu.isepdiamniadio.tic.dbe.MairieExpress.Models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -30,19 +31,19 @@ public class Mairie {
     private List<Document> documents;
 
     @ManyToMany
+    @JsonIgnore
     private List<AdminSysteme> adminSystemes;
 
-    @OneToOne
-    private AdminMairie adminMairie;
-
-    @OneToOne(mappedBy = "mairie")
-    private Officier officier;
-
+    @OneToMany(mappedBy = "mairie")
+    @JsonIgnore
+    private List<AdminMairie> adminMairie;
 
     @OneToMany(mappedBy = "mairie")
-    private List<Citoyen> citoyens;
+    @JsonIgnore
+    private List<Officier> officiers;
 
     @OneToMany(mappedBy = "mairie")
+    @JsonIgnore
     private List<Agent> agents;
 
 }

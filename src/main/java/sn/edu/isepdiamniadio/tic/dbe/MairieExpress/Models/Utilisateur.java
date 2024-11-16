@@ -5,6 +5,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+import java.util.Set;
+
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "type_user")
@@ -15,17 +18,15 @@ public class Utilisateur {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
-    private Integer id;
+    protected Integer id;
+
+    protected String nom;
+
+    protected String prenom;
 
     @Column(nullable = false)
-    private String nom;
+    protected String email;
 
-    @Column(nullable = false)
-    private String prenom;
-
-    @Column(nullable = false)
-    private String username;
-
-    @Column(nullable = false)
-    private String email;
+    @ManyToMany
+    protected List<Role> roles;
 }
