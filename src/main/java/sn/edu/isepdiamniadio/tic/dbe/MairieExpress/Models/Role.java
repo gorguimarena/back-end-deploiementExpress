@@ -1,11 +1,11 @@
 package sn.edu.isepdiamniadio.tic.dbe.MairieExpress.Models;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.Collection;
+import java.util.List;
 
 @Entity
 @Getter
@@ -19,4 +19,8 @@ public class Role{
     private String code;
 
     private String nom;
+
+    @ManyToMany(mappedBy = "roles")
+    @JsonIgnore
+    private List<Utilisateur> utilisateur;
 }

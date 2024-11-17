@@ -1,13 +1,19 @@
 package sn.edu.isepdiamniadio.tic.dbe.MairieExpress.Models;
 
-import jakarta.persistence.DiscriminatorValue;
-import jakarta.persistence.Entity;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.*;
+import lombok.*;
 
 @Entity
+@Getter
+@Setter
 @DiscriminatorValue("OFFICIER")
 public class Officier extends Utilisateur{
 
-    @OneToOne
+    @ManyToOne
     private Mairie mairie;
+
+    @Lob
+    private byte[] signature;
+
+
 }

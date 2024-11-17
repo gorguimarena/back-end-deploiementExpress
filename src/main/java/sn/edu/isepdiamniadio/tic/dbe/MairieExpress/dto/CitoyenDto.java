@@ -4,10 +4,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 
 @Getter
-public class RequestRegister {
-
+public class CitoyenDto {
     @JsonProperty("email")
     private String email;
+
+    @JsonProperty("password")
+    private String password;
 
     @JsonProperty("nom")
     private String nom;
@@ -18,6 +20,6 @@ public class RequestRegister {
     @JsonProperty("role")
     private String role;
 
-    @JsonProperty("idMairie")
-    private Integer idMirie;
+    @JsonProperty("username")
+    private String username;
 }

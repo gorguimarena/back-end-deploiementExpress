@@ -1,8 +1,6 @@
 package sn.edu.isepdiamniadio.tic.dbe.MairieExpress.Models;
 
-import jakarta.persistence.DiscriminatorValue;
-import jakarta.persistence.Entity;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,7 +11,7 @@ import lombok.Setter;
 @Setter
 public class AdminMairie extends Utilisateur{
 
-    @OneToOne(mappedBy = "adminMairie")
+    @ManyToOne
     private Mairie mairie;
 
 }

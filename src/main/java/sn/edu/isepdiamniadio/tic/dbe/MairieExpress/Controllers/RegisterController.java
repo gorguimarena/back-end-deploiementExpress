@@ -12,7 +12,6 @@ import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.Service.KeycloakService;
 import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.dto.RequestRegister;
 
 
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/user/")
@@ -23,9 +22,8 @@ public class RegisterController {
 
     @PostMapping("registe")
     public ResponseEntity<?> register(@RequestBody RequestRegister r){
-        return keycloakService.creerUser(r.getUsername(), PasswordGenerator.generateDefaultPassword(),r.getPrenom(),r.getNom(),r.getEmail(),r.getRole());
+        String username = keycloakService.getUsernameFromEmail(r.getEmail());
+        return keycloakService.createAdmin(r.getEmail(),PasswordGenerator.generateDefaultPassword(),r.getNom(),r.getPrenom(),r.getRole(),r.getIdMirie(),username);
     }
-
-
 
 }

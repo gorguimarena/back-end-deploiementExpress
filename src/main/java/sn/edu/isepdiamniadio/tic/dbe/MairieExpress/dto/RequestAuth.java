@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 public class RequestAuth {
-    @JsonProperty("username")
+    @JsonProperty("email")
     String username;
 
     @JsonProperty("password")

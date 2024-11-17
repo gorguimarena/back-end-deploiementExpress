@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -20,6 +21,8 @@ import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 
 import java.util.Collections;
 
@@ -42,24 +45,9 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
         jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwtConverter);
-        CsrfTokenRequestAttributeHandler csrfTokenRequestAttributeHandler = new CsrfTokenRequestAttributeHandler();
-
-        http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                        .cors(corsConfig->corsConfig.configurationSource(new CorsConfigurationSource() {
-                            @Override
-                            public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
-                                CorsConfiguration config = new CorsConfiguration();
-                                config.setAllowCredentials(true);
-                                config.setAllowedOrigins(Collections.singletonList("http://locahost:4200"));
-                                config.setAllowedHeaders(Collections.singletonList("*"));
-                                config.setAllowedMethods(Collections.singletonList("*"));
-                                config.setExposedHeaders(Collections.singletonList("Authorization"));
-                                config.setMaxAge(3600L);
-                                return config;
-                            }
-                        }));
 
         http.csrf(AbstractHttpConfigurer::disable)
+                .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers("/api/auth").permitAll()
                         .requestMatchers(HttpMethod.POST,"/api/registe").permitAll()
@@ -69,11 +57,27 @@ public class SecurityConfig {
                         .requestMatchers("/api/agent/**").hasRole(AGENT)
                         .requestMatchers("/api/officier/**").hasRole(OFFICIER)
                         .requestMatchers("/api/citoyen/**").hasRole(CITOYEN)
-                        .requestMatchers("/api/user/**").hasAnyRole(ADMINSYSTEME,ADMINMAIRIE)
+                        .requestMatchers("/api/user/**").permitAll()
                         .anyRequest().authenticated());
 
         http.oauth2ResourceServer(rsc->rsc.jwt(jwtConfigurer -> jwtConfigurer.jwtAuthenticationConverter(jwtAuthenticationConverter)));
         return http.build();
+    }
+
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(Collections.singletonList("http://localhost:4200"));
+        configuration.setAllowedMethods(Collections.singletonList("*"));
+        configuration.setAllowedHeaders(Collections.singletonList("*"));
+        configuration.setExposedHeaders(Collections.singletonList("Authorization"));
+        configuration.setAllowCredentials(true);
+        configuration.setMaxAge(3600L);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 
     @Bean
