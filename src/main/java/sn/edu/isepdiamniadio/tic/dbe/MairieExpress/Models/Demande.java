@@ -1,35 +1,47 @@
 package sn.edu.isepdiamniadio.tic.dbe.MairieExpress.Models;
 
+
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Date;
-import java.util.List;
 
 @Entity
 @Getter
 @Setter
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
 public class Demande {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
-    private Integer id;
+    private Long id;
 
-    private Date date_demande;
+    //Attributs spécifiques pour demande Extrait du registre des actes de naissance ou copie littérale
+    private String numeroRegistre;
+    private String nomInteresse;
+    private String prenomInterese;
 
+    // Attributs spécifiques pour demande de certificat d'acte de Mariage ou copie intégrale
+    private String numeroActeMariage;
+    private String prenomepoux;
+    private String nomepoux;
+    private String prenomepouse;
+    private String nomepouse;
 
-    private String status_demande;
+    //Attributs communs à toute demande
+    private Date dateDemande;
+    private String statutDemande;
+    private String typeDocument;
+
 
     @ManyToOne
     private Citoyen citoyen;
 
-    @ManyToMany
-    private List<Document> document;
+    @ManyToOne
+    private Document document;
 
-    @ManyToMany
-    private List<Agent> agents;
+    @ManyToOne
+    private Mairie mairie;
 
+    // Getters and Setters
 }

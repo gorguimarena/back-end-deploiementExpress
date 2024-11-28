@@ -63,6 +63,7 @@ public class AuthService {
 
     //methode pour se connecter
     public ResponseEntity<Map<String, Object>> authenticate(String email, String password) {
+        logger.debug("duguna------------------------------------------------------");
         String url = String.format("%s/protocol/openid-connect/token", authServerUrl);
 
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
