@@ -52,6 +52,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth").permitAll()
                         .requestMatchers(HttpMethod.POST,"/api/registe").permitAll()
                         .requestMatchers("/api/logout").permitAll()
+                        .requestMatchers("/demande/**").permitAll()
+                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
                         .requestMatchers("/api/adminsystem/**").hasRole(ADMINSYSTEME)
                         .requestMatchers("/api/adminmairie/**").hasRole(ADMINMAIRIE)
                         .requestMatchers("/api/agent/**").hasRole(AGENT)

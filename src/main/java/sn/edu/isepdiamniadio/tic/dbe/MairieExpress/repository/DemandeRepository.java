@@ -11,4 +11,8 @@ import java.util.Optional;
 public interface DemandeRepository extends JpaRepository<Demande,Long> {
     List<Demande> findByCitoyen(Citoyen citoyen);
     Optional<Demande> findByCitoyenId(Citoyen citoyen);
+
+    List<Demande> findByMairie_IdAndStatutDemande(Long mairieId, String enAttente);
+
+    List<Demande> findByMairieId(Integer mairieId);
 }

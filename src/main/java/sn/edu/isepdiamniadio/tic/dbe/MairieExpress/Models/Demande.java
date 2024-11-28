@@ -18,8 +18,8 @@ public class Demande {
 
     //Attributs spécifiques pour demande Extrait du registre des actes de naissance ou copie littérale
     private String numeroRegistre;
-    private String nomInteresse;
-    private String prenomInterese;
+    private String prenomInteresse;   // Prénom de l'individu concerné par le document
+    private String nomInteresse;      // Nom de l'individu concerné par le document
 
     // Attributs spécifiques pour demande de certificat d'acte de Mariage ou copie intégrale
     private String numeroActeMariage;
@@ -42,6 +42,8 @@ public class Demande {
 
     @ManyToOne
     private Mairie mairie;
+
+    private String pdfUrl;
 
     // Getters and Setters
 }
