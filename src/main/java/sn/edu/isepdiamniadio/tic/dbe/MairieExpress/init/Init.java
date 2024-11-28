@@ -59,7 +59,8 @@ public class Init implements CommandLineRunner {
         };
 
         Mairie mairie = Mairie.builder()
-                .nom("Sam notaire")
+                .region("Dakar")
+                .nom("Centre de l'etat civil")
                 .commune("Sam notaire")
                 .departement("Dakar")
                 .build();

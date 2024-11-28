@@ -18,14 +18,19 @@ public class Mairie {
     @Column(name = "id", nullable = false)
     private Integer id;
 
+
+
     @Column(nullable = false)
-    private String nom;
+    private String region;
 
     @Column(nullable = false)
     private String departement;
 
     @Column(nullable = false)
     private String commune;
+
+    @Column(nullable = false)
+    private String nom;
 
     @OneToMany(mappedBy = "mairie")
     private List<Document> documents;

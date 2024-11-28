@@ -65,6 +65,8 @@ public class UtilisateurService {
         }
         return officierRepository.save(officier);
     }
+
+
     public byte[] getSignature(Integer officierId) {
         Officier officier = officierRepository.findById(officierId).orElseThrow(() -> new RuntimeException("Officier not found"));
         return officier.getSignature();
