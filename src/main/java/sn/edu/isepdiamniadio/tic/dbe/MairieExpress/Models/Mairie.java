@@ -9,7 +9,7 @@ import java.util.List;
 @Entity
 @Builder
 @AllArgsConstructor
-@NoArgsConstructor
+//@NoArgsConstructor
 @Getter
 @Setter
 public class Mairie {
@@ -51,4 +51,17 @@ public class Mairie {
     @JsonIgnore
     private List<Agent> agents;
 
+
+    public Mairie() {} // Constructeur avec ID
+
+    public Mairie(Integer id) {
+        this.id = id;
+    }
+
+    public Mairie(String region, String departement, String commune, String nom) {
+        this.region = region;
+        this.departement = departement;
+        this.commune = commune;
+        this.nom = nom;
+    }
 }

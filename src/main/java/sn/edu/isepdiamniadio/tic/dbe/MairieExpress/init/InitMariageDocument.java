@@ -22,6 +22,7 @@ public class InitMariageDocument implements CommandLineRunner {
 
 
     @Override
+
     public void run(String... args) throws Exception {
 
         Mairie mairie = mairieRepository.findById(1)  // ID Integer

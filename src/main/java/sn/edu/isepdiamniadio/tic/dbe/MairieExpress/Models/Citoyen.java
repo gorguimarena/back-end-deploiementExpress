@@ -15,6 +15,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Citoyen extends Utilisateur{
+    private String token;
 
     @OneToMany(mappedBy = "citoyen")
     private List<Demande> demandes;

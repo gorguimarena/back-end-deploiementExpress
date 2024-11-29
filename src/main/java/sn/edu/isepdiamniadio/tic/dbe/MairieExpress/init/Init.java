@@ -2,6 +2,7 @@ package sn.edu.isepdiamniadio.tic.dbe.MairieExpress.init;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.Models.Mairie;
 import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.Models.Role;
@@ -13,6 +14,7 @@ import java.util.Arrays;
 import java.util.List;
 
 @Component
+@Order(1)
 public class Init implements CommandLineRunner {
 
     @Autowired
@@ -66,6 +68,8 @@ public class Init implements CommandLineRunner {
                 .build();
 
         mairieRepository.save(mairie);
+
+
 
         roleRepository.saveAll(Arrays.asList(roles));
 

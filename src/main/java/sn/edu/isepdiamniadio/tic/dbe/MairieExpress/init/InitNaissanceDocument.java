@@ -19,9 +19,12 @@ public class InitNaissanceDocument implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
+
+
+
 //---------------------------------------------------------------------------------------------------
         // Récupérer une mairie existante (par exemple, la mairie avec ID 1, mais en Integer)
-        Mairie mairie = mairieRepository.findById(1)  // ID Integer
+        Mairie mairiea = mairieRepository.findById(1)  // ID Integer
                 .orElseThrow(() -> new RuntimeException("Mairie introuvable"));
 
         // Création d'un NaissanceDocument
@@ -30,6 +33,7 @@ public class InitNaissanceDocument implements CommandLineRunner {
         naissanceDoc1.setAnLettre("Deux mille un");
         naissanceDoc1.setNumeroRegistre("937");
         naissanceDoc1.setNumRegistreLettre("Neuf cent trente sept");
+        naissanceDoc1.setSexe("Masculin");
         naissanceDoc1.setDateNaisanceLettre("vingt deux février deux mille un");
         naissanceDoc1.setHeureNaissancelettre("Vingt-deux heures");
         naissanceDoc1.setLieuNaissance("Dakar");
@@ -41,7 +45,7 @@ public class InitNaissanceDocument implements CommandLineRunner {
         naissanceDoc1.setNomMere("Ba");
 
         // Associer la mairie au document
-        naissanceDoc1.setMairie(mairie);
+        naissanceDoc1.setMairie(mairiea);
 
         // Enregistrer le document dans la base de données
         naissanceDocumentRepository.save(naissanceDoc1);
@@ -57,6 +61,7 @@ public class InitNaissanceDocument implements CommandLineRunner {
         naissanceDoc2.setNumeroRegistre("37");
         naissanceDoc2.setNumRegistreLettre("Neuf cent trente sept");
         naissanceDoc2.setDateNaisanceLettre("vingt deux Novembre deux mille ");
+        naissanceDoc2.setSexe("Masculin");
         naissanceDoc2.setHeureNaissancelettre("Vingt-deux heures");
         naissanceDoc2.setLieuNaissance("Dakar");
         naissanceDoc2.setPrenom("Gorgui");
