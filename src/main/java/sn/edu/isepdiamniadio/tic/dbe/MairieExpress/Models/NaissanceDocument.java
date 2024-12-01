@@ -11,13 +11,16 @@ import lombok.Data;
 public class NaissanceDocument extends Document {
 
     @Column(nullable = false)
-    private String AnNumero;
+    private String anNumero;
 
     @Column(nullable = false)
     private String AnLettre;
 
     @Column(nullable = false)
     private String numeroRegistre;
+
+    @Column(nullable = false)
+    private String sexe;
 
     @Column(nullable = false)
     private String numRegistreLettre;

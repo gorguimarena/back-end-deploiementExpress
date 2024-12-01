@@ -11,6 +11,6 @@ import java.util.Optional;
 public interface NaissanceDocumentRepository extends JpaRepository<NaissanceDocument,Integer> {
     NaissanceDocument findByDemande(Demande demande);
 
-
-    Optional<NaissanceDocument> findByNumeroRegistreAndNomAndPrenom(String numeroRegistre, String nomInteresse, String prenomInteresse);
+    boolean existsByNumeroRegistreAndAnNumeroAndPrenomAndNom(String numeroRegistre, String AnNumero, String prenom, String nom);
+    Optional<NaissanceDocument> findByNumeroRegistreAndAnNumeroAndPrenomAndNom(String numeroRegistre, String AnNumero, String prenom, String nom);
 }

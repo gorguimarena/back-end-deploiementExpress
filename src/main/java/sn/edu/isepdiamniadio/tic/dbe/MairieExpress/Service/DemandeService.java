@@ -3,16 +3,20 @@ package sn.edu.isepdiamniadio.tic.dbe.MairieExpress.Service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.Models.*;
+import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.Models.Citoyen;
+import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.Models.Mairie;
+import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.Models.Demande;
+import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.Models.DemandeRequest;
+import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.Models.DocumentEnvoye;
 import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.repository.*;
-import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.util.PDFGenerator;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+
 @Service
 public class DemandeService {
-
     @Autowired
     private DemandeRepository demandeRepository;
 
@@ -23,131 +27,91 @@ public class DemandeService {
     private MariageDocumentRepository mariageDocumentRepository;
 
     @Autowired
-    private MairieRepository mairieRepository;
+    private DocumentEnvoyeRepository documentEnvoyeRepository;
 
     @Autowired
     private CitoyenRepository citoyenRepository;
 
     @Autowired
-    private PDFGenerator pdfGenerator;
+    private PdfService pdfService;
 
-    public Demande createDemande(Integer mairieId, String typeDocument, String numeroRegistre,
-                                 String numeroActeMariage, String prenomInteresse, String nomInteresse,
-                                 String prenomEpoux, String nomEpoux, String prenomEpouse, String nomEpouse,
-                                 Integer citoyenId) throws Exception {
-
-        // Récupération de la mairie et du citoyen
-        Optional<Mairie> mairieOpt = mairieRepository.findById(mairieId);
-        Optional<Citoyen> citoyenOpt = citoyenRepository.findById(citoyenId);
-
-        if (mairieOpt.isEmpty()) {
-            throw new Exception("Mairie non trouvée");
+    public boolean checkDocumentExists(DemandeRequest demandeRequest) {
+        if ("extrait_de_naissance".equals(demandeRequest.getTypeDocument()) || "copie_litterale_d_acte_de_naissance".equals(demandeRequest.getTypeDocument())) {
+            return naissanceDocumentRepository.existsByNumeroRegistreAndAnNumeroAndPrenomAndNom(
+                    demandeRequest.getNumeroRegistre(), demandeRequest.getAnNumero(), demandeRequest.getPrenom(), demandeRequest.getNom());
+        } else if ("certificat_de_mariage_constante".equals(demandeRequest.getTypeDocument()) || "copie_litterale_acte_de_mariage".equals(demandeRequest.getTypeDocument())) {
+            return mariageDocumentRepository.existsByNumeroActeMariageAndPrenomEpouxAndNomEpouxAndPrenomEpouseAndNomEpouse(
+                    demandeRequest.getNumeroActeMariage(), demandeRequest.getPrenomEpoux(), demandeRequest.getNomEpoux(), demandeRequest.getPrenomEpouse(), demandeRequest.getNomEpouse());
         }
+        return false;
+    }
+
+    public void createDemande(DemandeRequest demandeRequest, String token) {
+        Optional<Citoyen> citoyenOpt = citoyenRepository.findByToken(token);
         if (citoyenOpt.isEmpty()) {
-            throw new Exception("Citoyen non trouvé");
+            throw new IllegalArgumentException("Citoyen non trouvé ou token invalide.");
         }
-
-        Mairie mairie = mairieOpt.get();
         Citoyen citoyen = citoyenOpt.get();
 
-        // Création de la demande
-        Demande demande = new Demande();
-        demande.setMairie(mairie);
-        demande.setCitoyen(citoyen);
-        demande.setTypeDocument(typeDocument);
-        demande.setDateDemande(new java.util.Date());
-        demande.setStatutDemande("en attente");
+        boolean documentExists = checkDocumentExists(demandeRequest);
+        if (documentExists) {
+            Demande demande = new Demande();
+            demande.setCitoyen(citoyen);
+            demande.setMairie(new Mairie(demandeRequest.getMairieId()));
+            demande.setTypeDocument(demandeRequest.getTypeDocument());
+            demande.setStatutDemande("en attente");
+            demande.setDateDemande(new Date());
 
-        // Vérification des informations et ajout des données spécifiques au type de document
-        if ("extrait_de_naissance".equals(typeDocument) || "copie_litterale_de_naissance".equals(typeDocument)) {
-            // Vérification dans la table NaissanceDocument
-            Optional<NaissanceDocument> naissanceDocument = naissanceDocumentRepository
-                    .findByNumeroRegistreAndNomAndPrenom(numeroRegistre, nomInteresse, prenomInteresse);
-
-            if (naissanceDocument.isEmpty()) {
-                throw new Exception("Les informations de naissance ne correspondent à aucun enregistrement.");
+            // Définir les champs spécifiques
+            if ("extrait_de_naissance".equals(demandeRequest.getTypeDocument()) || "copie_litterale_d_acte_de_naissance".equals(demandeRequest.getTypeDocument())) {
+                demande.setNumeroRegistre(demandeRequest.getNumeroRegistre());
+                demande.setPrenomInteresse(demandeRequest.getPrenom());
+                demande.setNomInteresse(demandeRequest.getNom());
+                demande.setAnNumero(demandeRequest.getAnNumero());
+            } else if ("certificat_de_mariage_constante".equals(demandeRequest.getTypeDocument()) || "copie_litterale_acte_de_mariage".equals(demandeRequest.getTypeDocument())) {
+                demande.setNumeroActeMariage(demandeRequest.getNumeroActeMariage());
+                demande.setPrenomepoux(demandeRequest.getPrenomEpoux());
+                demande.setNomepoux(demandeRequest.getNomEpoux());
+                demande.setPrenomepouse(demandeRequest.getPrenomEpouse());
+                demande.setNomepouse(demandeRequest.getNomEpouse());
+                demande.setDatemary(demandeRequest.getDatemary());
             }
 
-            // Ajout des données à la demande
-            demande.setNumeroRegistre(numeroRegistre);
-            demande.setPrenomInteresse(prenomInteresse);
-            demande.setNomInteresse(nomInteresse);
-        } else if ("certificat_mariage".equals(typeDocument) || "copie_litterale_mariage".equals(typeDocument)) {
-            // Vérification dans la table MariageDocument
-            Optional<MariageDocument> mariageDocument = mariageDocumentRepository
-                    .findByNumeroActeMariageAndNomEpouxAndPrenomEpouxAndNomEpouseAndPrenomEpouse(
-                            numeroActeMariage, nomEpoux, prenomEpoux, nomEpouse, prenomEpouse);
-
-            if (mariageDocument.isEmpty()) {
-                throw new Exception("Les informations de mariage ne correspondent à aucun enregistrement.");
-            }
-
-            // Ajout des données à la demande
-            demande.setNumeroActeMariage(numeroActeMariage);
-            demande.setPrenomepoux(prenomEpoux);
-            demande.setNomepoux(nomEpoux);
-            demande.setPrenomepouse(prenomEpouse);
-            demande.setNomepouse(nomEpouse);
-        }
-
-        // Sauvegarde de la demande avant génération du PDF
-        Demande savedDemande = demandeRepository.save(demande);
-
-        // Génération du PDF associé à la demande
-        String pdfPath = pdfGenerator.generatePDF(savedDemande);
-
-        // Assurez-vous que le PDF a bien été généré avant de mettre à jour la demande
-        if (pdfPath != null && !pdfPath.isEmpty()) {
-            savedDemande.setPdfUrl(pdfPath);
-            // Sauvegarde de l'URL du PDF dans la base de données
-            savedDemande = demandeRepository.save(savedDemande);
+            demandeRepository.save(demande);
         } else {
-            throw new Exception("Erreur lors de la génération du PDF.");
+            throw new IllegalArgumentException("Les informations fournies ne sont pas valides.");
         }
-
-        return savedDemande;
     }
 
-    public List<Demande> getAllDemandeForMairie(Integer mairieId) {
+    public void validerDemande(Long id) {
+        Optional<Demande> demandeOpt = demandeRepository.findById(id);
+        if (demandeOpt.isPresent()) {
+            Demande demande = demandeOpt.get();
+            demande.setStatutDemande("validé");
+            demandeRepository.save(demande);
+
+            Object documentInfos = null;
+            if ("extrait_de_naissance".equals(demande.getTypeDocument()) || "copie_litterale_d_acte_de_naissance".equals(demande.getTypeDocument())) {
+                documentInfos = naissanceDocumentRepository.findByNumeroRegistreAndAnNumeroAndPrenomAndNom(
+                        demande.getNumeroRegistre(), demande.getAnNumero(), demande.getPrenomInteresse(), demande.getNomInteresse());
+            } else if ("certificat_de_mariage_constante".equals(demande.getTypeDocument()) || "copie_litterale_acte_de_mariage".equals(demande.getTypeDocument())) {
+                documentInfos = mariageDocumentRepository.findByNumeroActeMariageAndPrenomEpouxAndNomEpouxAndPrenomEpouseAndNomEpouse(
+                        demande.getNumeroActeMariage(), demande.getPrenomepoux(), demande.getNomepoux(), demande.getPrenomepouse(), demande.getNomepouse());
+            }
+
+            byte[] pdfData = pdfService.generatePdf(demande, documentInfos);
+            DocumentEnvoye documentEnvoye = new DocumentEnvoye();
+            documentEnvoye.setDemande(demande);
+            documentEnvoye.setCitoyen(demande.getCitoyen());
+            documentEnvoye.setMairie(demande.getMairie());
+            documentEnvoye.setPdfUrl("URL du PDF généré");
+            documentEnvoyeRepository.save(documentEnvoye);
+        } else {
+            throw new IllegalArgumentException("Demande non trouvée.");
+        }
+    }
+
+    public List<Demande> getDemandesByMairie(Integer mairieId) {
         return demandeRepository.findByMairieId(mairieId);
     }
-
-    /**
-     * Valide une demande en générant un PDF
-     *
-     * @param demandeId  ID de la demande à valider
-     * @param officierId
-     * @return La demande validée
-     * @throws Exception Si la validation échoue
-     */
-    public Demande validateDemande(Long demandeId, Long officierId) throws Exception {
-        Optional<Demande> demandeOpt = demandeRepository.findById(demandeId);
-
-        if (demandeOpt.isEmpty()) {
-            throw new Exception("Demande non trouvée");
-        }
-
-        Demande demande = demandeOpt.get();
-        demande.setStatutDemande("validée");
-
-        // Générer le PDF
-        String pdfPath = pdfGenerator.generatePDF(demande);
-        demande.setPdfUrl(pdfPath);
-
-        return demandeRepository.save(demande);
-    }
-
-    public Demande rejectDemande(Long demandeId) throws Exception {
-        Optional<Demande> demandeOpt = demandeRepository.findById(demandeId);
-
-        if (demandeOpt.isEmpty()) {
-            throw new Exception("Demande non trouvée");
-        }
-
-        Demande demande = demandeOpt.get();
-        demande.setStatutDemande("rejetée");
-
-        return demandeRepository.save(demande);
-    }
-
 }

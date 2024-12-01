@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 @Entity
@@ -19,7 +20,8 @@ public class Demande {
     //Attributs spécifiques pour demande Extrait du registre des actes de naissance ou copie littérale
     private String numeroRegistre;
     private String prenomInteresse;   // Prénom de l'individu concerné par le document
-    private String nomInteresse;      // Nom de l'individu concerné par le document
+    private String nomInteresse;
+    private String AnNumero;
 
     // Attributs spécifiques pour demande de certificat d'acte de Mariage ou copie intégrale
     private String numeroActeMariage;
@@ -27,6 +29,7 @@ public class Demande {
     private String nomepoux;
     private String prenomepouse;
     private String nomepouse;
+    private LocalDate datemary;
 
     //Attributs communs à toute demande
     private Date dateDemande;
@@ -45,5 +48,13 @@ public class Demande {
 
     private String pdfUrl;
 
-    // Getters and Setters
+
+    public boolean isNaissanceDocument() {
+        return "extrait_de_naissance".equals(typeDocument) || "copie_litterale_d_acte_de_naissance".equals(typeDocument);
+    }
+
+
+    public boolean isMariageDocument() {
+        return "certificat_de_mariage_constante".equals(typeDocument) || "copie_litterale_acte_de_mariage".equals(typeDocument);
+    }
 }

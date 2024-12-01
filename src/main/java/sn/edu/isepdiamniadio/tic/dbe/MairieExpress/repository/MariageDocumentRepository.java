@@ -13,4 +13,8 @@ public interface MariageDocumentRepository extends JpaRepository<MariageDocument
 
 
     Optional<MariageDocument> findByNumeroActeMariageAndNomEpouxAndPrenomEpouxAndNomEpouseAndPrenomEpouse(String numeroActeMariage, String nomEpoux, String prenomEpoux, String nomEpouse, String prenomEpouse);
+
+    boolean existsByNumeroActeMariageAndPrenomEpouxAndNomEpouxAndPrenomEpouseAndNomEpouse( String numeroActeMariage, String prenomEpoux, String nomEpoux, String prenomEpouse, String nomEpouse);
+
+    Object findByNumeroActeMariageAndPrenomEpouxAndNomEpouxAndPrenomEpouseAndNomEpouse(String numeroActeMariage, String prenomepoux, String nomepoux, String prenomepouse, String nomepouse);
 }

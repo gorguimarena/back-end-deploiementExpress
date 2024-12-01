@@ -22,6 +22,7 @@ public class InitMariageDocument implements CommandLineRunner {
 
 
     @Override
+
     public void run(String... args) throws Exception {
         Mairie mairie0 = Mairie.builder()
                 .region("Dakar")
