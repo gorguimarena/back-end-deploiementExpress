@@ -1,15 +1,19 @@
 package sn.edu.isepdiamniadio.tic.dbe.MairieExpress.init;
 
+import org.hibernate.sql.ast.tree.expression.Collation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
+import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.Models.Citoyen;
 import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.Models.Mairie;
 import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.Models.Role;
+import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.repository.CitoyenRepository;
 import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.repository.MairieRepository;
 import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.repository.RoleRepository;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 @Component
@@ -17,6 +21,9 @@ public class Init implements CommandLineRunner {
 
     @Autowired
     private RoleRepository roleRepository;
+
+    @Autowired
+    CitoyenRepository citoyenRepository;
 
     @Autowired
     private MairieRepository mairieRepository;
@@ -51,23 +58,27 @@ public class Init implements CommandLineRunner {
                 .build();
 
         Role []roles = {
-                roleCitoyen,
                 roleOfficier,
                 roleAdminSyst,
                 roleAdminMairie,
                 roleAgent
         };
 
-        Mairie mairie = Mairie.builder()
-                .region("Dakar")
-                .nom("Centre de l'etat civil")
-                .commune("Sam notaire")
-                .departement("Dakar")
-                .build();
 
-        mairieRepository.save(mairie);
+
 
         roleRepository.saveAll(Arrays.asList(roles));
+        Role roleC = roleRepository.save(roleCitoyen);
+
+        Citoyen citoyen = new Citoyen();
+
+        citoyen.setPrenom("hf");
+        citoyen.setNom("hf");
+        citoyen.setEmail("hf@gmail.com");
+        citoyen.setRoles(Collections.singletonList(roleC));
+
+        citoyenRepository.save(citoyen);
+
 
     }
 }

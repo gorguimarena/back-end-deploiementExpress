@@ -23,6 +23,15 @@ public class InitMariageDocument implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
+        Mairie mairie0 = Mairie.builder()
+                .region("Dakar")
+                .nom("Centre de l'etat civil")
+                .commune("Sam notaire")
+                .departement("Dakar")
+                .build();
+
+        mairieRepository.save(mairie0);
+
 
         Mairie mairie = mairieRepository.findById(1)  // ID Integer
                 .orElseThrow(() -> new RuntimeException("Mairie introuvable"));
@@ -79,11 +88,6 @@ public class InitMariageDocument implements CommandLineRunner {
         mariageDocumentRepository.save(mariageDoc1);
 
         System.out.println("MariageDocument inséré avec succès !");
-
-
-
-
-
 
     }
 }
