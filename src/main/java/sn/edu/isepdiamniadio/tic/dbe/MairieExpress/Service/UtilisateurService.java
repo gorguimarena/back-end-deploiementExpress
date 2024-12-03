@@ -71,5 +71,9 @@ public class UtilisateurService {
         Officier officier = officierRepository.findById(officierId).orElseThrow(() -> new RuntimeException("Officier not found"));
         return officier.getSignature();
     }
+
+    public List<AdminMairie> getAdminMairies(){
+        return adminMairieRepository.findAll();
+    }
 }
 

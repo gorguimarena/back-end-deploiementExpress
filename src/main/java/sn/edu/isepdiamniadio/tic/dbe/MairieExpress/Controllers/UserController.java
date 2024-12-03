@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.Models.AdminMairie;
 import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.Models.Utilisateur;
 import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.Service.UtilisateurService;
 
@@ -45,5 +46,10 @@ public class UserController {
         } catch (Exception e) {
             return ResponseEntity.status(404).body("Signature not found");
         }
+    }
+
+    @GetMapping("admin-mairies")
+    public List<AdminMairie> getAllUser() {
+        return utilisateurService.getAdminMairies();
     }
 }

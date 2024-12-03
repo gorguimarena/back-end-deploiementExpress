@@ -60,6 +60,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/officier/**").hasRole(OFFICIER)
                         .requestMatchers("/api/citoyen/**").hasRole(CITOYEN)
                         .requestMatchers("/api/user/**").permitAll()
+                        .requestMatchers("/api/mairie/**").permitAll()
                         .anyRequest().authenticated());
 
         http.oauth2ResourceServer(rsc->rsc.jwt(jwtConfigurer -> jwtConfigurer.jwtAuthenticationConverter(jwtAuthenticationConverter)));

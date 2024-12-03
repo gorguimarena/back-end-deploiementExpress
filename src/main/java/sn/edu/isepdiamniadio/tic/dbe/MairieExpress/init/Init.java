@@ -5,9 +5,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.Models.AdminSysteme;
 import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.Models.Citoyen;
 import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.Models.Mairie;
 import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.Models.Role;
+import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.repository.AdminSystemeRepository;
 import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.repository.CitoyenRepository;
 import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.repository.MairieRepository;
 import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.repository.RoleRepository;
@@ -25,7 +27,7 @@ public class Init implements CommandLineRunner {
     private RoleRepository roleRepository;
 
     @Autowired
-    CitoyenRepository citoyenRepository;
+    AdminSystemeRepository adminSystemeRepository;
 
     @Autowired
     private MairieRepository mairieRepository;
@@ -61,28 +63,21 @@ public class Init implements CommandLineRunner {
 
         Role []roles = {
                 roleOfficier,
-                roleAdminSyst,
+                roleCitoyen,
                 roleAdminMairie,
                 roleAgent
         };
 
-
-
-
-
-
         roleRepository.saveAll(Arrays.asList(roles));
-        Role roleC = roleRepository.save(roleCitoyen);
+        Role roleC = roleRepository.save(roleAdminSyst);
 
-        Citoyen citoyen = new Citoyen();
+        AdminSysteme adminSysteme = new AdminSysteme();
 
-        citoyen.setPrenom("hf");
-        citoyen.setNom("hf");
-        citoyen.setEmail("hf@gmail.com");
-        citoyen.setRoles(Collections.singletonList(roleC));
+        adminSysteme.setRoles(Collections.singletonList(roleC));
+        adminSysteme.setEmail("adminsystem@gmail.com");
+        adminSysteme.setNom("Admin");
+        adminSysteme.setPrenom("System");
 
-        citoyenRepository.save(citoyen);
-
-
+        adminSystemeRepository.save(adminSysteme);
     }
 }

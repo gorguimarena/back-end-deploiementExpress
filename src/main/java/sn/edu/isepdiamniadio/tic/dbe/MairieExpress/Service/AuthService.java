@@ -76,7 +76,7 @@ public class AuthService {
                 tokenResponse = keycloak.tokenManager().getAccessToken();
             } catch (Exception e) {
                 logger.error("Erreur lors de la récupération du token d'accès pour l'utilisateur {}: {}", email, e.getMessage());
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
             }
             if (tokenResponse != null) {
                 Optional<Utilisateur> userOptional = utilisateurRepository.findByEmail(email);

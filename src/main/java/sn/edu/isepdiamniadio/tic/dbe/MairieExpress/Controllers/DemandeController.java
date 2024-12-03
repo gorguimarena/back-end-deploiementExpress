@@ -6,7 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.Models.Demande;
-import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.Models.DemandeRequest;
+import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.dto.DemandeRequest;
 import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.Models.DocumentEnvoye;
 import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.Service.DemandeService;
 import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.Service.CitoyenService;

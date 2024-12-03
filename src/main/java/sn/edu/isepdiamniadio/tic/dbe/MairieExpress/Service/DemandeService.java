@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.Models.Citoyen;
 import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.Models.Mairie;
 import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.Models.Demande;
-import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.Models.DemandeRequest;
+import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.dto.DemandeRequest;
 import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.Models.DocumentEnvoye;
 import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.repository.*;
 
