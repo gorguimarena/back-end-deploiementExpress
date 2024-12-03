@@ -5,10 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
-import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.Models.AdminSysteme;
-import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.Models.Citoyen;
-import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.Models.Mairie;
-import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.Models.Role;
+import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.Models.*;
 import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.repository.AdminSystemeRepository;
 import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.repository.CitoyenRepository;
 import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.repository.MairieRepository;
@@ -64,20 +61,25 @@ public class Init implements CommandLineRunner {
         Role []roles = {
                 roleOfficier,
                 roleCitoyen,
-                roleAdminMairie,
                 roleAgent
         };
 
         roleRepository.saveAll(Arrays.asList(roles));
         Role roleC = roleRepository.save(roleAdminSyst);
+        Role roleA = roleRepository.save(roleAdminMairie);
 
         AdminSysteme adminSysteme = new AdminSysteme();
 
-        adminSysteme.setRoles(Collections.singletonList(roleC));
+        adminSysteme.setRoles(Collections.singletonList(roleA));
         adminSysteme.setEmail("adminsystem@gmail.com");
         adminSysteme.setNom("Admin");
         adminSysteme.setPrenom("System");
 
+        AdminMairie adminMairie = new AdminMairie();
+        adminMairie.setRoles(Collections.singletonList(roleC));
+        adminMairie.setEmail("adminmairie@gmail.com");
+        adminMairie.setNom("Admin");
+        adminMairie.setPrenom("Mairie");
         adminSystemeRepository.save(adminSysteme);
     }
 }

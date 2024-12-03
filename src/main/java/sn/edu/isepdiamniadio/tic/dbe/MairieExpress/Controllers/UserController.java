@@ -48,8 +48,12 @@ public class UserController {
         }
     }
 
-    @GetMapping("admin-mairies")
+    @GetMapping("/admin-mairies")
     public List<AdminMairie> getAllUser() {
         return utilisateurService.getAdminMairies();
+    }
+    @GetMapping("/users-mairie/{idMairie}")
+    public List<?> getUserMairie(@PathVariable Integer idMairie) {
+        return utilisateurService.getUsersMairie(idMairie);
     }
 }
