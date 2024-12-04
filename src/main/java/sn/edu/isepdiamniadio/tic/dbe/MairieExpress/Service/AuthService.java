@@ -1,3 +1,4 @@
+
 package sn.edu.isepdiamniadio.tic.dbe.MairieExpress.Service;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -55,62 +56,6 @@ public class AuthService {
     @Autowired
     private UtilisateurRepository userRepository;
 
-    private final RestTemplate restTemplate = new RestTemplate();
-
-
-    private final HttpHeaders headers = new HttpHeaders();
-
-
-    //methode pour se connecter
-    public ResponseEntity<Map<String, Object>> authenticate(String email, String password) {
-        logger.debug("duguna------------------------------------------------------");
-        String url = String.format("%s/protocol/openid-connect/token", authServerUrl);
-
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-
-        String body = String.format("grant_type=password&client_id=%s&username=%s&password=%s&client_secret=%s",
-                clientId, email, password, clientSecret);
-        HttpEntity<String> entity = new HttpEntity<>(body, headers);
-
-        try {
-            ResponseEntity<String> response = restTemplate.postForEntity(url, entity, String.class);
-
-            if (response.getStatusCode() == HttpStatus.OK) {
-                try {
-                    Optional<Utilisateur> user = utilisateurRepository.findByEmail(email);
-                    if (user.isPresent()) {
-                        Utilisateur u = user.get();
-                        ObjectMapper mapper = new ObjectMapper();
-                        JsonNode root = mapper.readTree(response.getBody());
-                        repons.put("access_token", root.get("access_token").asText());
-                        repons.put("refresh_token", root.get("refresh_token").asText());
-                        repons.put("response", "succee");
-                        repons.put("userId", u.getId());
-                        repons.put("role", u.getRoles().getFirst());
-                        return ResponseEntity.ok().body(repons);
-                    } else {
-                        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-                    }
-                } catch (Exception e) {
-                    repons.put("access_token", null);
-                    repons.put("response", "errorMapping");
-                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(repons);
-                }
-            } else {
-                repons.put("access_token", null);
-                repons.put("response", "failedAuthentication");
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(repons);
-            }
-        } catch (Exception e) {
-            repons.put("access_token", null);
-            repons.put("response", "error");
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(repons);
-        }
-
-
-    }
-
-
     public ResponseEntity<Map<String, Object>> authenticateUser(String email, String password) {
         Map<String, Object> response = new HashMap<>();
         try {
@@ -132,10 +77,7 @@ public class AuthService {
                 tokenResponse = keycloak.tokenManager().getAccessToken();
             } catch (Exception e) {
                 logger.error("Erreur lors de la récupération du token d'accès pour l'utilisateur {}: {}", email, e.getMessage());
-                response.put("access_token", null);
-                response.put("response", "Authentication failed");
-                response.put("message", "Veillez revoir vos informations d'authentification ");
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
             }
             if (tokenResponse != null) {
                 Optional<Utilisateur> userOptional = utilisateurRepository.findByEmail(email);
@@ -149,21 +91,15 @@ public class AuthService {
                     logger.info("Authentification réussie pour l'utilisateur : {}", email);
                     return ResponseEntity.ok(response);
                 } else {
-                    response.put("response", "User not found");
                     logger.warn("Utilisateur non trouvé : {}", email);
                     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
                 }
             } else {
-                response.put("access_token", null);
-                response.put("response", "Authentication failed");
                 logger.error("Echec de l'authentification pour l'utilisateur : {}", email);
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
             }
         } catch (Exception e) {
             logger.error("Erreur interne lors de l'authentification de l'utilisateur {}: {}", email, e.getMessage());
-            response.put("access_token", null);
-            response.put("response", "error");
-            response.put("message", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
@@ -194,6 +130,3 @@ public class AuthService {
     }
 
 }
-
-
-

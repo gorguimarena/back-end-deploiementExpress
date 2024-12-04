@@ -40,7 +40,6 @@ public class InitNaissanceDocument implements CommandLineRunner {
         naissanceDoc1.setPrenom("Boubou Djamil");
         naissanceDoc1.setNom("Diop");
         naissanceDoc1.setPrenomPere("Oumar");
-        naissanceDoc1.setNomPere("Diop");
         naissanceDoc1.setPrenomMere("Coumba");
         naissanceDoc1.setNomMere("Ba");
 
@@ -67,7 +66,6 @@ public class InitNaissanceDocument implements CommandLineRunner {
         naissanceDoc2.setPrenom("Gorgui");
         naissanceDoc2.setNom("Diop");
         naissanceDoc2.setPrenomPere("Djamil");
-        naissanceDoc2.setNomPere("Diop");
         naissanceDoc2.setPrenomMere("Soumayatu");
         naissanceDoc2.setNomMere("Diena");
 

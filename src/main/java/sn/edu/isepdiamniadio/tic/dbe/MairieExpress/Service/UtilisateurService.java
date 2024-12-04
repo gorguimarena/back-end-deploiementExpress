@@ -1,3 +1,4 @@
+
 package sn.edu.isepdiamniadio.tic.dbe.MairieExpress.Service;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -5,17 +6,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.Models.AdminMairie;
-import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.Models.Citoyen;
-import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.Models.Officier;
-import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.Models.Utilisateur;
-import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.repository.AdminMairieRepository;
-import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.repository.CitoyenRepository;
-import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.repository.OfficierRepository;
-import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.repository.UtilisateurRepository;
+import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.Models.*;
+import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.repository.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,7 +30,13 @@ public class UtilisateurService {
     @Autowired
     private UtilisateurRepository utilisateurRepository;
 
+    @Autowired
+    private MairieRepository mairieRepository;
+
     List<Utilisateur> utilisateurList = new ArrayList<>();
+
+    @Autowired
+    private AgentRepository agentRepository;
 
 
     public ResponseEntity<?> getIdMairie(int idUtilisateur) {
@@ -71,5 +73,26 @@ public class UtilisateurService {
         Officier officier = officierRepository.findById(officierId).orElseThrow(() -> new RuntimeException("Officier not found"));
         return officier.getSignature();
     }
-}
 
+    public List<AdminMairie> getAdminMairies() {
+        return adminMairieRepository.findAll();
+    }
+
+    public List<Object> getUsersMairie(Integer mairieId) {
+        Mairie mairie = mairieRepository.findById(mairieId).orElseThrow(() -> new RuntimeException("Mairie not found"));
+        Optional<Officier> officiers = officierRepository.findByMairie(mairie);
+        Optional<AdminMairie> adminMairies = adminMairieRepository.findByMairie(mairie);
+        Optional<Agent> agents = agentRepository.findByMairie(mairie);
+        List<Object> allUsers = new ArrayList<>();
+        if (agents.isPresent()){
+            allUsers.add(agents);
+        }
+        if (adminMairies.isPresent()){
+            allUsers.add(adminMairies);
+        }
+        if (officiers.isPresent()){
+            allUsers.add(officiers);
+        }
+        return allUsers;
+    }
+}

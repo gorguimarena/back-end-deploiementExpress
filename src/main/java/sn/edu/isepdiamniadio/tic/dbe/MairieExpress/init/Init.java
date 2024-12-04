@@ -1,16 +1,20 @@
+
 package sn.edu.isepdiamniadio.tic.dbe.MairieExpress.init;
 
+import org.hibernate.sql.ast.tree.expression.Collation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
-import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.Models.Mairie;
-import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.Models.Role;
+import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.Models.*;
+import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.repository.AdminSystemeRepository;
+import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.repository.CitoyenRepository;
 import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.repository.MairieRepository;
 import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.repository.RoleRepository;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 @Component
@@ -19,6 +23,9 @@ public class Init implements CommandLineRunner {
 
     @Autowired
     private RoleRepository roleRepository;
+
+    @Autowired
+    AdminSystemeRepository adminSystemeRepository;
 
     @Autowired
     private MairieRepository mairieRepository;
@@ -53,25 +60,27 @@ public class Init implements CommandLineRunner {
                 .build();
 
         Role []roles = {
-                roleCitoyen,
                 roleOfficier,
-                roleAdminSyst,
-                roleAdminMairie,
+                roleCitoyen,
                 roleAgent
         };
 
-        Mairie mairie = Mairie.builder()
-                .region("Dakar")
-                .nom("Centre de l'etat civil")
-                .commune("Sam notaire")
-                .departement("Dakar")
-                .build();
-
-        mairieRepository.save(mairie);
-
-
-
         roleRepository.saveAll(Arrays.asList(roles));
+        Role roleC = roleRepository.save(roleAdminSyst);
+        Role roleA = roleRepository.save(roleAdminMairie);
 
+        AdminSysteme adminSysteme = new AdminSysteme();
+
+        adminSysteme.setRoles(Collections.singletonList(roleA));
+        adminSysteme.setEmail("adminsystem@gmail.com");
+        adminSysteme.setNom("Admin");
+        adminSysteme.setPrenom("System");
+
+        AdminMairie adminMairie = new AdminMairie();
+        adminMairie.setRoles(Collections.singletonList(roleC));
+        adminMairie.setEmail("adminmairie@gmail.com");
+        adminMairie.setNom("Admin");
+        adminMairie.setPrenom("Mairie");
+        adminSystemeRepository.save(adminSysteme);
     }
 }

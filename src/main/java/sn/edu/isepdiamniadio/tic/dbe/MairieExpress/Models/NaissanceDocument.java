@@ -43,8 +43,6 @@ public class NaissanceDocument extends Document {
     @Column(nullable = false)
     private String prenomPere;
 
-    @Column(nullable = false)
-    private String nomPere;
 
     @Column(nullable = false)
     private String prenomMere;

@@ -52,7 +52,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth").permitAll()
                         .requestMatchers(HttpMethod.POST,"/api/registe").permitAll()
                         .requestMatchers("/api/logout").permitAll()
-                        .requestMatchers("/demande/**").permitAll()
+                        .requestMatchers("/demande/citoyen/**").hasRole(CITOYEN)
+                        .requestMatchers("/demande/agent/**").hasRole(AGENT)
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
                         .requestMatchers("/api/adminsystem/**").hasRole(ADMINSYSTEME)
                         .requestMatchers("/api/adminmairie/**").hasRole(ADMINMAIRIE)
@@ -60,6 +61,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/officier/**").hasRole(OFFICIER)
                         .requestMatchers("/api/citoyen/**").hasRole(CITOYEN)
                         .requestMatchers("/api/user/**").permitAll()
+                        .requestMatchers("/api/mairie/**").permitAll()
                         .anyRequest().authenticated());
 
         http.oauth2ResourceServer(rsc->rsc.jwt(jwtConfigurer -> jwtConfigurer.jwtAuthenticationConverter(jwtAuthenticationConverter)));
