@@ -70,13 +70,13 @@ public class Init implements CommandLineRunner {
 
         AdminSysteme adminSysteme = new AdminSysteme();
 
-        adminSysteme.setRoles(Collections.singletonList(roleA));
+        adminSysteme.setRoles(Collections.singletonList(roleC));
         adminSysteme.setEmail("adminsystem@gmail.com");
         adminSysteme.setNom("Admin");
         adminSysteme.setPrenom("System");
 
         AdminMairie adminMairie = new AdminMairie();
-        adminMairie.setRoles(Collections.singletonList(roleC));
+        adminMairie.setRoles(Collections.singletonList(roleA));
         adminMairie.setEmail("adminmairie@gmail.com");
         adminMairie.setNom("Admin");
         adminMairie.setPrenom("Mairie");
