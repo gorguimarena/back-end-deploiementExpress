@@ -29,5 +29,7 @@ public class MairieService {
     public List<Mairie> getMairies() {
         return mairieRepository.findAll();
     }
+
+    public List<Mairie> searchMairies(String query) { return mairieRepository.findByNomContainingIgnoreCase(query); }
 }
 

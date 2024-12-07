@@ -1,6 +1,7 @@
 package sn.edu.isepdiamniadio.tic.dbe.MairieExpress.Service;
 
 
+import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.core.Response;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.KeycloakBuilder;
@@ -60,30 +61,6 @@ public class KeycloakService {
     }
 
 
-
-   /* public ResponseEntity<?> user(String username) {
-        Keycloak keycloak = KeycloakService.connectKeycloak();
-
-        RealmResource realmResource = keycloak.realm(realm);
-        UsersResource usersResource = realmResource.users();
-
-        try {
-            List<UserRepresentation> users = usersResource.search(username, 0, 1);
-            System.out.println("Résultat de la recherche utilisateur : " + users);
-
-            if (!users.isEmpty()) {
-                return ResponseEntity.ok(users.getFirst());
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Erreur interne : " + e.getMessage());
-        }
-
-
-        return ResponseEntity.notFound().build();
-    }*/
-
     public ResponseEntity<?> createUserKeycloak(String email, String password, String nom, String prenom,String role,String username) {
         // Connexion à Keycloak
         Keycloak keycloak = connectKeycloak();
@@ -140,6 +117,7 @@ public class KeycloakService {
         }
         return ResponseEntity.status(HttpStatus.CREATED).body("User created");
     }
+
 
 
     public ResponseEntity<?> createAdmin(String email, String password, String nom, String prenom,String role,Integer idMairie, String username) {
@@ -270,13 +248,6 @@ public class KeycloakService {
             UserResource userResource = usersResource.get(userId);
             UserRepresentation userRepresentation = userResource.toRepresentation();
 
-            // Mettre à jour les informations utilisateur avec les valeurs fournies
-            if (updatedInfo.containsKey("firstName")) {
-                userRepresentation.setFirstName(updatedInfo.get("firstName"));
-            }
-            if (updatedInfo.containsKey("lastName")) {
-                userRepresentation.setLastName(updatedInfo.get("lastName"));
-            }
             if (updatedInfo.containsKey("email")) {
                 userRepresentation.setEmail(updatedInfo.get("email"));
             }
@@ -309,5 +280,66 @@ public class KeycloakService {
         return !usersByEmail.isEmpty();
     }
 
+    public ResponseEntity<?> deactivateUserByEmail(String email) {
+        // Rechercher l'utilisateur par email
+        UserRepresentation user = getUserByEmail(email);
 
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Utilisateur non trouvé avec l'email : " + email);
+        }
+
+        // Désactiver l'utilisateur
+        return deactivateUser(user.getId());
+    }
+
+    public ResponseEntity<?> deactivateUser(String userId) {
+        // Connexion à Keycloak
+        Keycloak keycloak = connectKeycloak();
+
+        // Obtenir le Realm
+        RealmResource realmResource = keycloak.realm(realm);
+        UsersResource usersResource = realmResource.users();
+
+        // Récupérer l'utilisateur par son ID
+        UserResource userResource = usersResource.get(userId);
+
+        try {
+            UserRepresentation user = userResource.toRepresentation();
+
+            // Désactiver l'utilisateur
+            user.setEnabled(false);
+
+            // Appliquer les modifications
+            userResource.update(user);
+
+            return ResponseEntity.ok("Utilisateur désactivé avec succès");
+        } catch (NotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Utilisateur non trouvé");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erreur lors de la désactivation de l'utilisateur");
+        }
+    }
+
+
+
+    public UserRepresentation getUserByEmail(String email) {
+        // Connexion à Keycloak
+        Keycloak keycloak = connectKeycloak();
+
+        // Obtenir le Realm
+        RealmResource realmResource = keycloak.realm(realm);
+        UsersResource usersResource = realmResource.users();
+
+        // Rechercher les utilisateurs par email
+        List<UserRepresentation> users = usersResource.search(null, null, null, email, null, null);
+
+        // Vérifier si un utilisateur correspond
+        if (users != null && !users.isEmpty()) {
+            // Retourner le premier utilisateur correspondant
+            return users.getFirst();
+        }
+
+        // Retourner null si aucun utilisateur trouvé
+        return null;
+    }
 }

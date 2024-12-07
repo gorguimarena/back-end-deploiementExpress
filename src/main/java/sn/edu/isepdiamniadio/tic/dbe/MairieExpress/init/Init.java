@@ -7,10 +7,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.Models.*;
-import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.repository.AdminSystemeRepository;
-import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.repository.CitoyenRepository;
-import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.repository.MairieRepository;
-import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.repository.RoleRepository;
+import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.repository.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,6 +26,8 @@ public class Init implements CommandLineRunner {
 
     @Autowired
     private MairieRepository mairieRepository;
+    @Autowired
+    private AdminMairieRepository adminMairieRepository;
 
     @Override
     public void run(String... args) throws Exception {
@@ -82,5 +81,6 @@ public class Init implements CommandLineRunner {
         adminMairie.setNom("Admin");
         adminMairie.setPrenom("Mairie");
         adminSystemeRepository.save(adminSysteme);
+        adminMairieRepository.save(adminMairie);
     }
 }
