@@ -12,7 +12,7 @@ public class DemandeRequest {
     @JsonProperty("citoyenId")
     private Integer citoyenId;
 
-    @JsonProperty("idMairie")
+    @JsonProperty("mairieId")
     private Integer mairieId;
 
     @JsonProperty("typeDocument")
@@ -30,7 +30,7 @@ public class DemandeRequest {
     @JsonProperty("nom")
     private String nom;
 
-    @JsonProperty("AnNumero")
+    @JsonProperty("anneeDeNaissance")
     private String AnNumero;
 
     @JsonProperty("numeroActeMariage")

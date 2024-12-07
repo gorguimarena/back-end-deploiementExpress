@@ -3,6 +3,7 @@ package sn.edu.isepdiamniadio.tic.dbe.MairieExpress.Controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -30,9 +31,11 @@ public class DemandeController {
     private CitoyenRepository citoyenRepository;
 
     // Endpoint pour créer une demande
-    @PostMapping("/citoyen")
+    @PostMapping(value = "/citoyen", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> createDemande(@RequestBody DemandeRequest demandeRequest, @AuthenticationPrincipal Jwt jwt) {
         try {
+
+            System.out.println(jwt.getClaims());
             // Extraire l'adresse e-mail du token
             String email = jwt.getClaim("email");
 

@@ -54,7 +54,7 @@ public class KeycloakService {
         return KeycloakBuilder.builder()
                 .serverUrl("http://localhost:8080")
                 .realm("master")
-                .username("jokernole")
+                .username("admin")
                 .password("admin")
                 .clientId("admin-cli")
                 .build();
