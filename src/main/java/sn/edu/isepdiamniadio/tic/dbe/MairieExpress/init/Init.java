@@ -1,3 +1,4 @@
+
 package sn.edu.isepdiamniadio.tic.dbe.MairieExpress.init;
 
 import org.hibernate.sql.ast.tree.expression.Collation;
@@ -70,13 +71,13 @@ public class Init implements CommandLineRunner {
 
         AdminSysteme adminSysteme = new AdminSysteme();
 
-        adminSysteme.setRoles(Collections.singletonList(roleC));
+        adminSysteme.setRoles(Collections.singletonList(roleA));
         adminSysteme.setEmail("adminsystem@gmail.com");
         adminSysteme.setNom("Admin");
         adminSysteme.setPrenom("System");
 
         AdminMairie adminMairie = new AdminMairie();
-        adminMairie.setRoles(Collections.singletonList(roleA));
+        adminMairie.setRoles(Collections.singletonList(roleC));
         adminMairie.setEmail("adminmairie@gmail.com");
         adminMairie.setNom("Admin");
         adminMairie.setPrenom("Mairie");

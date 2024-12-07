@@ -1,5 +1,7 @@
 package sn.edu.isepdiamniadio.tic.dbe.MairieExpress.Service;
 
+
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.Models.Mairie;
@@ -28,3 +30,4 @@ public class MairieService {
         return mairieRepository.findAll();
     }
 }
+

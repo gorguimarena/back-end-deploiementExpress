@@ -1,3 +1,4 @@
+
 package sn.edu.isepdiamniadio.tic.dbe.MairieExpress.Service;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -95,4 +96,3 @@ public class UtilisateurService {
         return allUsers;
     }
 }
-

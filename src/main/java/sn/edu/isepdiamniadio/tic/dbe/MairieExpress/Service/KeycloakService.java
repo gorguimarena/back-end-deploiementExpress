@@ -53,11 +53,12 @@ public class KeycloakService {
         return KeycloakBuilder.builder()
                 .serverUrl("http://localhost:8080")
                 .realm("master")
-                .username("admin")
+                .username("jokernole")
                 .password("admin")
                 .clientId("admin-cli")
                 .build();
     }
+
 
 
    /* public ResponseEntity<?> user(String username) {
