@@ -5,9 +5,14 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
 import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
 public class NaissanceDocument extends Document {
 
     @Column(nullable = false)
@@ -56,8 +61,6 @@ public class NaissanceDocument extends Document {
 
     @ManyToOne
     private Demande demande;
-
-
 
 }
 

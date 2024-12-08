@@ -3,11 +3,8 @@ package sn.edu.isepdiamniadio.tic.dbe.MairieExpress.Service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.Models.Citoyen;
-import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.Models.Mairie;
-import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.Models.Demande;
+import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.Models.*;
 import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.dto.DemandeRequest;
-import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.Models.DocumentEnvoye;
 import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.repository.*;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -41,10 +38,17 @@ public class DemandeService {
     @Autowired
     private PdfService pdfService;
 
+
+
     public boolean checkDocumentExists(DemandeRequest demandeRequest) {
         if ("extrait_de_naissance".equals(demandeRequest.getTypeDocument()) || "copie_litterale_d_acte_de_naissance".equals(demandeRequest.getTypeDocument())) {
-            return naissanceDocumentRepository.existsByNumeroRegistreAndAnNumeroAndPrenomAndNom(
-                    demandeRequest.getNumeroRegistre(), demandeRequest.getAnNumero(), demandeRequest.getPrenom(), demandeRequest.getNom());
+            Optional<NaissanceDocument> naissanceDocument = naissanceDocumentRepository.findByNumeroRegistre(demandeRequest.getNumeroRegistre());
+
+            return
+                    naissanceDocument.isPresent() &&
+                            naissanceDocument.get().getNumeroRegistre().equals(demandeRequest.getNumeroRegistre()) &&
+                            naissanceDocument.get().getPrenom().equalsIgnoreCase(demandeRequest.getPrenom()) &&
+                            naissanceDocument.get().getNom().equalsIgnoreCase(demandeRequest.getNom());
         } else if ("certificat_de_mariage_constante".equals(demandeRequest.getTypeDocument()) || "copie_litterale_acte_de_mariage".equals(demandeRequest.getTypeDocument())) {
             return mariageDocumentRepository.existsByNumeroActeMariageAndPrenomEpouxAndNomEpouxAndPrenomEpouseAndNomEpouse(
                     demandeRequest.getNumeroActeMariage(), demandeRequest.getPrenomEpoux(), demandeRequest.getNomEpoux(), demandeRequest.getPrenomEpouse(), demandeRequest.getNomEpouse());

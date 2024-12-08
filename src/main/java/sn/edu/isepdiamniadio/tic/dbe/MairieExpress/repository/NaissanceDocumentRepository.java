@@ -13,4 +13,6 @@ public interface NaissanceDocumentRepository extends JpaRepository<NaissanceDocu
 
     boolean existsByNumeroRegistreAndAnNumeroAndPrenomAndNom(String numeroRegistre, String AnNumero, String prenom, String nom);
     Optional<NaissanceDocument> findByNumeroRegistreAndAnNumeroAndPrenomAndNom(String numeroRegistre, String AnNumero, String prenom, String nom);
+
+    Optional<NaissanceDocument> findByNumeroRegistre(String numeroRegistre);
 }

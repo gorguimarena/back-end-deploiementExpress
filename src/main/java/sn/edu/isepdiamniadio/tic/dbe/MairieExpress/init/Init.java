@@ -25,6 +25,9 @@ public class Init implements CommandLineRunner {
     AdminSystemeRepository adminSystemeRepository;
 
     @Autowired
+    CitoyenRepository citoyenRepository;
+
+    @Autowired
     private MairieRepository mairieRepository;
     @Autowired
     private AdminMairieRepository adminMairieRepository;
@@ -60,13 +63,14 @@ public class Init implements CommandLineRunner {
 
         Role []roles = {
                 roleOfficier,
-                roleCitoyen,
                 roleAgent
         };
 
         roleRepository.saveAll(Arrays.asList(roles));
         Role roleC = roleRepository.save(roleAdminSyst);
         Role roleA = roleRepository.save(roleAdminMairie);
+
+        Role roleB = roleRepository.save(roleCitoyen);
 
         AdminSysteme adminSysteme = new AdminSysteme();
 
@@ -82,5 +86,15 @@ public class Init implements CommandLineRunner {
         adminMairie.setPrenom("Mairie");
         adminSystemeRepository.save(adminSysteme);
         adminMairieRepository.save(adminMairie);
+
+        Citoyen citoyen = new Citoyen();
+
+        citoyen.setRoles(Collections.singletonList(roleB));
+        citoyen.setEmail("citoyen@gmail.com");
+        citoyen.setNom("Citoyen");
+        citoyen.setPrenom("Citoyen");
+
+        citoyenRepository.save(citoyen);
+
     }
 }

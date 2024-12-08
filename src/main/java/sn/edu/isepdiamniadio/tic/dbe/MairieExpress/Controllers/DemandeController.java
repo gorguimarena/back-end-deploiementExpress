@@ -48,7 +48,7 @@ public class DemandeController {
 
             // Créer la demande
             demandeService.createDemande(demandeRequest, citoyen);
-            return ResponseEntity.ok("Demande créée avec succès et en attente de validation.");
+            return ResponseEntity.status(HttpStatus.CREATED).build();
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
@@ -73,6 +73,10 @@ public class DemandeController {
         return ResponseEntity.ok(demandes);
     }
 
+    @GetMapping("/citoyen/{id}")
+    public ResponseEntity<List<Demande>> getDemandeByCitoyen(@PathVariable Integer id) {
+        return citoyenService.getDemandes(id);
+    }
     // Endpoint pour obtenir les documents envoyés à un citoyen
     @GetMapping("/citoyen/{id}/documents")
     public ResponseEntity<?> getDocumentsEnvoyes(@PathVariable Integer id) {
