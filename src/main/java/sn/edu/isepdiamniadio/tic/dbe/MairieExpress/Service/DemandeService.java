@@ -11,6 +11,11 @@ import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.Models.DocumentEnvoye;
 import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.repository.*;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.KeyFactory;
 import java.security.PublicKey;
 import java.security.spec.X509EncodedKeySpec;
@@ -188,7 +193,7 @@ public class DemandeService {
 
 
 
-
+/*
     public void validerDemande(Long id) {
         Optional<Demande> demandeOpt = demandeRepository.findById(id);
         if (demandeOpt.isPresent()) {
@@ -216,6 +221,60 @@ public class DemandeService {
             throw new IllegalArgumentException("Demande non trouvée.");
         }
     }
+
+ */
+public String validerDemande(Long id) {
+    Optional<Demande> demandeOpt = demandeRepository.findById(id);
+    if (demandeOpt.isEmpty()) {
+        throw new IllegalArgumentException("Demande non trouvée.");
+    }
+
+    Demande demande = demandeOpt.get();
+
+    // Changer le statut de la demande
+    demande.setStatutDemande("validé");
+    demandeRepository.save(demande);
+
+    // Rechercher les informations spécifiques au document
+    Object documentInfos = null;
+    if ("extrait_de_naissance".equals(demande.getTypeDocument()) ||
+            "copie_litterale_d_acte_de_naissance".equals(demande.getTypeDocument())) {
+        documentInfos = naissanceDocumentRepository.findByNumeroRegistreAndAnNumeroAndPrenomAndNom(
+                demande.getNumeroRegistre(), demande.getAnNumero(), demande.getPrenomInteresse(), demande.getNomInteresse());
+    } else if ("certificat_de_mariage_constante".equals(demande.getTypeDocument()) ||
+            "copie_litterale_acte_de_mariage".equals(demande.getTypeDocument())) {
+        documentInfos = mariageDocumentRepository.findByNumeroActeMariageAndPrenomEpouxAndNomEpouxAndPrenomEpouseAndNomEpouse(
+                demande.getNumeroActeMariage(), demande.getPrenomepoux(), demande.getNomepoux(), demande.getPrenomepouse(), demande.getNomepouse());
+    }
+
+    // Générer le fichier PDF
+    byte[] pdfData = pdfService.generatePdf(demande, documentInfos);
+    if (pdfData == null) {
+        throw new RuntimeException("Erreur lors de la génération du PDF.");
+    }
+
+    // Sauvegarder le fichier sur le disque ou un stockage distant
+    String pdfFilename = "pdfs/demande-" + id + ".pdf"; // Chemin relatif
+    Path pdfPath = Paths.get(pdfFilename);
+    try {
+        Files.createDirectories(pdfPath.getParent());
+        Files.write(pdfPath, pdfData);
+    } catch (IOException e) {
+        throw new RuntimeException("Erreur lors de l'enregistrement du fichier PDF.", e);
+    }
+
+    // Enregistrer les informations dans la table DocumentEnvoye
+    DocumentEnvoye documentEnvoye = new DocumentEnvoye();
+    documentEnvoye.setDemande(demande);
+    documentEnvoye.setCitoyen(demande.getCitoyen());
+    documentEnvoye.setMairie(demande.getMairie());
+    documentEnvoye.setPdfUrl(pdfPath.toString()); // Stocke l'URL ou le chemin
+    documentEnvoyeRepository.save(documentEnvoye);
+
+    // Retourner l'URL du PDF
+    return pdfPath.toString();
+}
+
 
     public List<Demande> getDemandesByMairie(Integer mairieId) {
         return demandeRepository.findByMairieId(mairieId);

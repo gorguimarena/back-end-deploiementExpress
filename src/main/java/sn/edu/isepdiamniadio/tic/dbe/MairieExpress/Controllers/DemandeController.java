@@ -52,14 +52,34 @@ public class DemandeController {
     }
 
 
+
     // Endpoint pour valider une demande par un agent
-    @PostMapping("/agent/{id}/valider")
+   /* @PostMapping("/agent/{id}/valider")
     public ResponseEntity<?> validerDemande(@PathVariable Long id) {
         try {
             demandeService.validerDemande(id);
             return ResponseEntity.ok("Demande validée et PDF envoyé.");
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+    }
+
+
+    */
+
+    @PostMapping("/agent/{id}/valider")
+    public ResponseEntity<?> validerDemande(@PathVariable Long id) {
+        try {
+            // Appel du service pour valider la demande et générer le PDF
+            String pdfUrl = demandeService.validerDemande(id);
+
+            // Répondre avec succès et fournir l'URL générée
+            return ResponseEntity.ok("Demande validée et PDF envoyé. URL : " + pdfUrl);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Erreur lors de la validation de la demande : " + e.getMessage());
         }
     }
 

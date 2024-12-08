@@ -18,14 +18,7 @@ public class InitMairie implements CommandLineRunner {
     public void run(String... args) throws Exception {
 
 
-        Mairie mairie = Mairie.builder()
-                .region("Dakar")
-                .nom("Centre de l'etat civil Dakar plateau")
-                .commune("Dakar plateau")
-                .departement("Dakar")
-                .build();
 
-        mairieRepository.save(mairie);
 
 
 

@@ -10,4 +10,5 @@ import java.util.Optional;
 @Repository
 public interface OfficierRepository extends JpaRepository<Officier,Integer> {
     Optional<Officier> findByMairie(Mairie mairie);
+    Optional<Officier> findFirstByMairieId(Integer mairieId);
 }
