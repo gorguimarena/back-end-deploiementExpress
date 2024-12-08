@@ -10,12 +10,15 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.Models.Citoyen;
 import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.Models.Demande;
+import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.Models.Notification;
 import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.dto.DemandeRequest;
 import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.Models.DocumentEnvoye;
 import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.Service.DemandeService;
 import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.Service.CitoyenService;
 import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.repository.CitoyenRepository;
+import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.repository.NotificationRepository;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,12 +33,14 @@ public class DemandeController {
     @Autowired
     private CitoyenRepository citoyenRepository;
 
+    @Autowired
+    private NotificationRepository notificationRepository;
+
     // Endpoint pour créer une demande
     @PostMapping(value = "/citoyen", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> createDemande(@RequestBody DemandeRequest demandeRequest, @AuthenticationPrincipal Jwt jwt) {
         try {
 
-            System.out.println(jwt.getClaims());
             // Extraire l'adresse e-mail du token
             String email = jwt.getClaim("email");
 
@@ -47,7 +52,17 @@ public class DemandeController {
             Citoyen citoyen = citoyenOpt.get();
 
             // Créer la demande
-            demandeService.createDemande(demandeRequest, citoyen);
+            Demande demande = demandeService.createDemande(demandeRequest, citoyen);
+            Notification notification = Notification.builder()
+                    .dateCreation(new Date())
+                    .citoyen(citoyen)
+                    .demande(demande)
+                    .message("Votre demande est en traitement !")
+                    .typeNotification("Notifier pour une demande "+demandeRequest.getTypeDocument())
+                    .build();
+
+            notificationRepository.save(notification);
+
             return ResponseEntity.status(HttpStatus.CREATED).build();
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());

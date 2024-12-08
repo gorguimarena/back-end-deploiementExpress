@@ -1,6 +1,7 @@
 package sn.edu.isepdiamniadio.tic.dbe.MairieExpress.Service;
 
 
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.Models.*;
@@ -38,7 +39,8 @@ public class DemandeService {
     @Autowired
     private PdfService pdfService;
 
-
+    @Autowired
+    private NotificationRepository notificationRepository;
 
     public boolean checkDocumentExists(DemandeRequest demandeRequest) {
         if ("extrait_de_naissance".equals(demandeRequest.getTypeDocument()) || "copie_litterale_d_acte_de_naissance".equals(demandeRequest.getTypeDocument())) {
@@ -54,6 +56,30 @@ public class DemandeService {
                     demandeRequest.getNumeroActeMariage(), demandeRequest.getPrenomEpoux(), demandeRequest.getNomEpoux(), demandeRequest.getPrenomEpouse(), demandeRequest.getNomEpouse());
         }
         return false;
+    }
+    public List<Notification> getNotificationsByCitoyen(Integer citoyenId) {
+        Citoyen citoyen = citoyenRepository.findById(citoyenId)
+                .orElseThrow(() -> new EntityNotFoundException("Citoyen non trouvé"));
+
+        List<Notification> notifications = notificationRepository.findByCitoyenOrderByDateCreationDesc(citoyen);
+
+        if (notifications.isEmpty()) {
+            System.out.println("Aucune notification trouvée pour le citoyen ID : " + citoyenId);
+        }
+
+        return notifications;
+    }
+
+    public void markNotificationAsRead(Integer notificationId) {
+        Notification notification = notificationRepository.findById(notificationId)
+                .orElseThrow(() -> new EntityNotFoundException("Notification non trouvée"));
+
+        if (!"lu".equals(notification.getStatut())) {
+            notification.setStatut("lu");
+            notificationRepository.save(notification);
+        } else {
+            System.out.println("Notification ID : " + notificationId + " est déjà marquée comme lue.");
+        }
     }
 
    /* public void createDemande(DemandeRequest demandeRequest, String token) {
@@ -159,7 +185,7 @@ public class DemandeService {
 */
 
 
-        public void createDemande(DemandeRequest demandeRequest, Citoyen citoyen) {
+        public Demande createDemande(DemandeRequest demandeRequest, Citoyen citoyen) {
             boolean documentExists = checkDocumentExists(demandeRequest);
             if (documentExists) {
                 Demande demande = new Demande();
@@ -184,10 +210,11 @@ public class DemandeService {
                     demande.setDatemary(demandeRequest.getDatemary());
                 }
 
-                demandeRepository.save(demande);
+                return demandeRepository.save(demande);
             } else {
                 throw new IllegalArgumentException("Les informations fournies ne sont pas valides.");
             }
+
         }
 
 
