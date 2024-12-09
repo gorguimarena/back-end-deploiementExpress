@@ -23,36 +23,19 @@ public class Init implements CommandLineRunner {
 
     @Autowired
     AdminSystemeRepository adminSystemeRepository;
-    @Autowired
-    AdminMairieRepository adminMairieRepository;
 
     @Autowired
-    private MairieRepository mairieRepository;
+    CitoyenRepository citoyenRepository;
 
-    @Autowired
-    private OfficierRepository officierRepository;
+
 
     @Override
     public void run(String... args) throws Exception {
         System.out.println("Mairie Express");
 
-        Mairie mairie = Mairie.builder()
-                .region("Dakar")
-                .nom("Centre de l'etat civil Dakar plateau")
-                .commune("Dakar plateau")
-                .departement("Dakar")
-                .build();
-
-        mairieRepository.save(mairie);
-
         Role roleCitoyen = Role.builder()
                 .code("citoyen")
                 .nom("citoyen")
-                .build();
-
-        Role roleOfficier = Role.builder()
-                .code("officier")
-                .nom("officier")
                 .build();
 
         Role roleAdminSyst = Role.builder()
@@ -60,36 +43,11 @@ public class Init implements CommandLineRunner {
                 .nom("adminSystem")
                 .build();
 
-        Role roleAdminMairie = Role.builder()
-                .code("adminMairie")
-                .nom("adminMairie")
-                .build();
 
-        Role roleAgent = Role.builder()
-                .code("agent")
-                .nom("agent")
-                .build();
 
-        Role []roles = {
-                roleCitoyen,
-                roleAgent
-        };
+        Role roleB = roleRepository.save(roleCitoyen);
 
-        roleRepository.saveAll(Arrays.asList(roles));
         Role roleC = roleRepository.save(roleAdminSyst);
-        Role roleA = roleRepository.save(roleAdminMairie);
-        Role off=roleRepository.save(roleOfficier);
-
-        Mairie mairieg = mairieRepository.findById(1) .orElseThrow(() -> new RuntimeException("Mairie not found"));
-
-        Officier officier=new Officier();
-        officier.setRoles(Collections.singletonList(off));
-        officier.setEmail("hello@gmail.com");
-        officier.setNom("bubu");
-        officier.setPrenom("bubu");
-        officier.setMairie(mairieg);
-        officierRepository.save(officier);
-
 
         AdminSysteme adminSysteme = new AdminSysteme();
 
@@ -97,14 +55,18 @@ public class Init implements CommandLineRunner {
         adminSysteme.setEmail("adminsystem@gmail.com");
         adminSysteme.setNom("Admin");
         adminSysteme.setPrenom("System");
-
-        AdminMairie adminMairie = new AdminMairie();
-        adminMairie.setRoles(Collections.singletonList(roleA));
-        adminMairie.setEmail("adminmairie@gmail.com");
-        adminMairie.setNom("Admin");
-        adminMairie.setPrenom("Mairie");
         adminSystemeRepository.save(adminSysteme);
-        adminMairieRepository.save(adminMairie);
+
+
+
+        Citoyen citoyen = new Citoyen();
+
+        citoyen.setRoles(Collections.singletonList(roleB));
+        citoyen.setEmail("citoyen@gmail.com");
+        citoyen.setNom("Citoyen");
+        citoyen.setPrenom("Citoyen");
+
+        citoyenRepository.save(citoyen);
 
     }
 }

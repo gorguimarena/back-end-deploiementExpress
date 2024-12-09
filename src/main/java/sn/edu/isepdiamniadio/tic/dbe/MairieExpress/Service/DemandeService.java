@@ -270,8 +270,12 @@ public String validerDemande(Long id) {
     Object documentInfos = null;
     if ("extrait_de_naissance".equals(demande.getTypeDocument()) ||
             "copie_litterale_d_acte_de_naissance".equals(demande.getTypeDocument())) {
-        documentInfos = naissanceDocumentRepository.findByNumeroRegistreAndAnNumeroAndPrenomAndNom(
-                demande.getNumeroRegistre(), demande.getAnNumero(), demande.getPrenomInteresse(), demande.getNomInteresse());
+        Optional<NaissanceDocument> naissanceDocument = naissanceDocumentRepository.findByNumeroRegistre(demande.getNumeroRegistre());
+        if(naissanceDocument.isPresent() &&
+                naissanceDocument.get().getPrenom().equalsIgnoreCase(demande.getPrenomInteresse()) &&
+                naissanceDocument.get().getNom().equalsIgnoreCase(demande.getNomInteresse())){
+            documentInfos = naissanceDocument.get();
+        }
     } else if ("certificat_de_mariage_constante".equals(demande.getTypeDocument()) ||
             "copie_litterale_acte_de_mariage".equals(demande.getTypeDocument())) {
         documentInfos = mariageDocumentRepository.findByNumeroActeMariageAndPrenomEpouxAndNomEpouxAndPrenomEpouseAndNomEpouse(

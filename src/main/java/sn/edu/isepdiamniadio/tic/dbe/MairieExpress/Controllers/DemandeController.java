@@ -91,6 +91,8 @@ public class DemandeController {
             // Appel du service pour valider la demande et générer le PDF
             String pdfUrl = demandeService.validerDemande(id);
 
+            System.out.println("Demande Okkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk");
+
             // Répondre avec succès et fournir l'URL générée
             return ResponseEntity.ok("Demande validée et PDF envoyé. URL : " + pdfUrl);
         } catch (IllegalArgumentException e) {
@@ -112,6 +114,7 @@ public class DemandeController {
     public ResponseEntity<List<Demande>> getDemandeByCitoyen(@PathVariable Integer id) {
         return citoyenService.getDemandes(id);
     }
+
     // Endpoint pour obtenir les documents envoyés à un citoyen
     @GetMapping("/citoyen/{id}/documents")
     public ResponseEntity<?> getDocumentsEnvoyes(@PathVariable Integer id) {
@@ -121,5 +124,9 @@ public class DemandeController {
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
+    }
+
+    @GetMapping("/pdf/{id}") public ResponseEntity<byte[]> getPdf(@PathVariable Long id){
+        return citoyenService.getFile(id);
     }
 }

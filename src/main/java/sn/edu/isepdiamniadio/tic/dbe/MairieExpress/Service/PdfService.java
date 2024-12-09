@@ -23,14 +23,13 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.Locale;
-
 @Service
 public class PdfService {
 
     @Autowired
     private OfficierRepository officierRepository;
     @Autowired
-            private UtilisateurService utilisateurService;
+    private UtilisateurService utilisateurService;
     LocalDate today = LocalDate.now();
     String formattedDate = today.format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.FRENCH));
     @Autowired
@@ -84,11 +83,11 @@ public class PdfService {
             PdfContentByte canvas = writer.getDirectContent();
             String rightHeader = ""; // Exemple d'informations
             ColumnText.showTextAligned(
-                   canvas,
-                   Element.ALIGN_RIGHT,// Alignement à droite
-                   new Phrase(rightHeader, normalFont), // Texte
-                   550, 820,                           // Coordonnées en haut à droite
-                   0                                   // Rotation
+                    canvas,
+                    Element.ALIGN_RIGHT,// Alignement à droite
+                    new Phrase(rightHeader, normalFont), // Texte
+                    550, 820,                           // Coordonnées en haut à droite
+                    0                                   // Rotation
             );
 
 
@@ -293,7 +292,7 @@ public class PdfService {
             document.add(officierName);
 
 
-           //-----------------------------------------------------------------------------
+            //-----------------------------------------------------------------------------
             PDFUtils.addQRCodeWithDetails(document);
 
             // Ajouter une image (signature) si nécessaire
