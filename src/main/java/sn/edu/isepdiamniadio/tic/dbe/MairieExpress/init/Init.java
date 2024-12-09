@@ -23,18 +23,27 @@ public class Init implements CommandLineRunner {
 
     @Autowired
     AdminSystemeRepository adminSystemeRepository;
-
     @Autowired
-    CitoyenRepository citoyenRepository;
+    AdminMairieRepository adminMairieRepository;
 
     @Autowired
     private MairieRepository mairieRepository;
+
     @Autowired
-    private AdminMairieRepository adminMairieRepository;
+    private OfficierRepository officierRepository;
 
     @Override
     public void run(String... args) throws Exception {
         System.out.println("Mairie Express");
+
+        Mairie mairie = Mairie.builder()
+                .region("Dakar")
+                .nom("Centre de l'etat civil Dakar plateau")
+                .commune("Dakar plateau")
+                .departement("Dakar")
+                .build();
+
+        mairieRepository.save(mairie);
 
         Role roleCitoyen = Role.builder()
                 .code("citoyen")
@@ -62,39 +71,40 @@ public class Init implements CommandLineRunner {
                 .build();
 
         Role []roles = {
-                roleOfficier,
+                roleCitoyen,
                 roleAgent
         };
 
         roleRepository.saveAll(Arrays.asList(roles));
         Role roleC = roleRepository.save(roleAdminSyst);
         Role roleA = roleRepository.save(roleAdminMairie);
+        Role off=roleRepository.save(roleOfficier);
 
-        Role roleB = roleRepository.save(roleCitoyen);
+        Mairie mairieg = mairieRepository.findById(1) .orElseThrow(() -> new RuntimeException("Mairie not found"));
+
+        Officier officier=new Officier();
+        officier.setRoles(Collections.singletonList(off));
+        officier.setEmail("hello@gmail.com");
+        officier.setNom("bubu");
+        officier.setPrenom("bubu");
+        officier.setMairie(mairieg);
+        officierRepository.save(officier);
+
 
         AdminSysteme adminSysteme = new AdminSysteme();
 
-        adminSysteme.setRoles(Collections.singletonList(roleA));
+        adminSysteme.setRoles(Collections.singletonList(roleC));
         adminSysteme.setEmail("adminsystem@gmail.com");
         adminSysteme.setNom("Admin");
         adminSysteme.setPrenom("System");
 
         AdminMairie adminMairie = new AdminMairie();
-        adminMairie.setRoles(Collections.singletonList(roleC));
+        adminMairie.setRoles(Collections.singletonList(roleA));
         adminMairie.setEmail("adminmairie@gmail.com");
         adminMairie.setNom("Admin");
         adminMairie.setPrenom("Mairie");
         adminSystemeRepository.save(adminSysteme);
         adminMairieRepository.save(adminMairie);
-
-        Citoyen citoyen = new Citoyen();
-
-        citoyen.setRoles(Collections.singletonList(roleB));
-        citoyen.setEmail("citoyen@gmail.com");
-        citoyen.setNom("Citoyen");
-        citoyen.setPrenom("Citoyen");
-
-        citoyenRepository.save(citoyen);
 
     }
 }

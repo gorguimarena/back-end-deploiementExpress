@@ -5,39 +5,42 @@ package sn.edu.isepdiamniadio.tic.dbe.MairieExpress.Service;
 
 
 import com.itextpdf.text.*;
+import com.itextpdf.text.Document;
 import com.itextpdf.text.pdf.ColumnText;
 import com.itextpdf.text.pdf.PdfContentByte;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.itextpdf.text.pdf.draw.LineSeparator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.Models.Demande;
-import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.Models.MariageDocument;
-import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.Models.NaissanceDocument;
-import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.Models.Officier;
+import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.Models.*;
 import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.repository.OfficierRepository;
+import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.repository.UtilisateurRepository;
 import sn.edu.isepdiamniadio.tic.dbe.MairieExpress.util.PDFUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.Locale;
 
 @Service
 public class PdfService {
+
     @Autowired
     private OfficierRepository officierRepository;
     @Autowired
             private UtilisateurService utilisateurService;
     LocalDate today = LocalDate.now();
     String formattedDate = today.format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.FRENCH));
+    @Autowired
+    private UtilisateurRepository utilisateurRepository;
 
 
-    public byte[] generatePdf(Demande demande, Object documentInfos) {
+    public byte[] generatePdf(Demande demande, Object documentInfos)  {
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
             Document document = new Document();
-            PdfWriter.getInstance(document, baos);
+            PdfWriter writer =PdfWriter.getInstance(document, baos);
             document.open();
 
             // Création d'une police pour les titres
@@ -45,44 +48,47 @@ public class PdfService {
 
             // Ajouter les informations en haut à gauche
             Paragraph header = new Paragraph();
-            header.add(new Paragraph(demande.getMairie().getRegion(), fontHeader));
-            header.add(new Paragraph(demande.getMairie().getDepartement(), fontHeader));
-            header.add(new Paragraph(demande.getMairie().getCommune(), fontHeader));
+            header.add(new Paragraph("Region de "+demande.getMairie().getRegion()));
+            header.add(new Paragraph("Departement de "+demande.getMairie().getDepartement()));
+            header.add(new Paragraph("Commune de "+demande.getMairie().getCommune()));
             header.add(new Paragraph(demande.getMairie().getNom(), fontHeader));
-
-
             // Aligner le texte à gauche
             header.setAlignment(Element.ALIGN_LEFT);
-
             // Ajouter le header au document
             document.add(header);
-
 
             // Police pour le titre
             Font titleFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 14);
             Font normalFont = FontFactory.getFont(FontFactory.HELVETICA, 12);
 
-// Ajouter le titre centré
+            Paragraph head = new Paragraph();
             Paragraph title1 = new Paragraph("RÉPUBLIQUE DU SÉNÉGAL", titleFont);
-            Paragraph title2 = new Paragraph("Un peulple- Un but- Une foi");
-            Paragraph title3 = new Paragraph("ETAT-CIVIL", titleFont);
-            title1.setAlignment(Element.ALIGN_CENTER);
-            title2.setAlignment(Element.ALIGN_CENTER);
-            title3.setAlignment(Element.ALIGN_CENTER);
-            document.add(title1);
-            document.add(title2);
-            document.add(title3);
+            title1.setAlignment(Element.ALIGN_RIGHT);
+            head.add(title1);
+
+            Paragraph title2 = new Paragraph("Un peuple- Un but- Une foi");
+            title2.setAlignment(Element.ALIGN_RIGHT);
+            head.add(title2);
+
+            Paragraph title3 = new Paragraph("ETAT-CIVIL");
+            title3.setAlignment(Element.ALIGN_RIGHT);
+            head.add(title3);
+
+            document.add(head);
+
+
+
 
 // Ajouter des informations alignées à droite du titre
-            PdfWriter writer = null;
+
             PdfContentByte canvas = writer.getDirectContent();
-            String rightHeader = "Informations supplémentaires ici"; // Exemple d'informations
+            String rightHeader = ""; // Exemple d'informations
             ColumnText.showTextAligned(
-                    canvas,
-                    Element.ALIGN_RIGHT,                // Alignement à droite
-                    new Phrase(rightHeader, normalFont), // Texte
-                    550, 820,                           // Coordonnées en haut à droite
-                    0                                   // Rotation
+                   canvas,
+                   Element.ALIGN_RIGHT,// Alignement à droite
+                   new Phrase(rightHeader, normalFont), // Texte
+                   550, 820,                           // Coordonnées en haut à droite
+                   0                                   // Rotation
             );
 
 
@@ -213,28 +219,38 @@ public class PdfService {
                     document.add(new Paragraph("\n")); // Saut de ligne
 
 // Informations sur l'ÉPOUX
-                    document.add(new Paragraph("L'époux :"));
-                    document.add(new Paragraph(acteMariage.getPrenomEpoux() + " " + acteMariage.getNomEpoux() +
-                            ", né le " + acteMariage.getNaissanceEpoux() + " à " + acteMariage.getLieunaissanceEpoux() + ","));
-                    document.add(new Paragraph("domicilié à " + acteMariage.getDomicileEpoux() + ", en résidence à " + acteMariage.getResidenceEpoux() + ","));
-                    document.add(new Paragraph("exerçant la profession de " + acteMariage.getProfessionEpoux() + ","));
-                    document.add(new Paragraph("fils de " + acteMariage.getNomparentepoux() + ", né(e) le " + acteMariage.getNaissanceparentepoux() +
-                            " à " + acteMariage.getLieunaissanceparentepoux() + ","));
-                    document.add(new Paragraph("exerçant la profession de " + acteMariage.getProfessionparentepoux() +
-                            " et domicilié à " + acteMariage.getDomicileparent() + "."));
-                    document.add(new Paragraph("\n")); // Saut de ligne
+                    String paragraphContent = "L'époux : " +
+                            acteMariage.getPrenomEpoux() + " " + acteMariage.getNomEpoux() +
+                            ", né le " + acteMariage.getNaissanceEpoux() + " à " + acteMariage.getLieunaissanceEpoux() + ", " +
+                            "domicilié à " + acteMariage.getDomicileEpoux() + ", en résidence à " + acteMariage.getResidenceEpoux() + ", " +
+                            "exerçant la profession de " + acteMariage.getProfessionEpoux() + ", " +
+                            "fils de " + acteMariage.getNomparentepoux() + ", né(e) le " + acteMariage.getNaissanceparentepoux() +
+                            " à " + acteMariage.getLieunaissanceparentepoux() + ", " +
+                            "exerçant la profession de " + acteMariage.getProfessionparentepoux() +
+                            " et domicilié à " + acteMariage.getDomicileparent() + ".";
+
+// Ajouter le paragraphe complet au document
+                    document.add(new Paragraph(paragraphContent));
+
+// Ajouter un saut de ligne
+                    document.add(new Paragraph("\n"));
 
 // Informations sur l'ÉPOUSE
-                    document.add(new Paragraph("L'épouse :"));
-                    document.add(new Paragraph(acteMariage.getPrenomEpouse() + " " + acteMariage.getNomEpouse() +
-                            ", née le " + acteMariage.getNaissanceEpouse() + " à " + acteMariage.getLieunaissanceEpouse() + ","));
-                    document.add(new Paragraph("domiciliée à " + acteMariage.getDomicileEpouse() + ", en résidence à " + acteMariage.getResidenceEpouse() + ","));
-                    document.add(new Paragraph("exerçant la profession de " + acteMariage.getProfessionEpouse() + ","));
-                    document.add(new Paragraph("fille de " + acteMariage.getNomparentepouse() + ", né(e) le " + acteMariage.getNaissanceparentepouse() +
-                            " à " + acteMariage.getLieunaissanceparentepouse() + ","));
-                    document.add(new Paragraph("exerçant la profession de " + acteMariage.getProfessionparentepouse() +
-                            " et domiciliée à " + acteMariage.getDomicileparentepouse() + "."));
-                    document.add(new Paragraph("\n")); // Saut de ligne
+                    String paragraphContentEpouse = "L'épouse : " +
+                            acteMariage.getPrenomEpouse() + " " + acteMariage.getNomEpouse() +
+                            ", née le " + acteMariage.getNaissanceEpouse() + " à " + acteMariage.getLieunaissanceEpouse() + ", " +
+                            "domiciliée à " + acteMariage.getDomicileEpouse() + ", en résidence à " + acteMariage.getResidenceEpouse() + ", " +
+                            "exerçant la profession de " + acteMariage.getProfessionEpouse() + ", " +
+                            "fille de " + acteMariage.getNomparentepouse() + ", né(e) le " + acteMariage.getNaissanceparentepouse() +
+                            " à " + acteMariage.getLieunaissanceparentepouse() + ", " +
+                            "exerçant la profession de " + acteMariage.getProfessionparentepouse() +
+                            " et domiciliée à " + acteMariage.getDomicileparentepouse() + ".";
+
+// Ajouter le paragraphe complet au document
+                    document.add(new Paragraph(paragraphContentEpouse));
+
+// Ajouter un saut de ligne
+                    document.add(new Paragraph("\n"));
 
 // Témoins
                     document.add(new Paragraph("Les témoins :"));
@@ -256,21 +272,34 @@ public class PdfService {
                     throw new IllegalArgumentException("Type de document inconnu: " + demande.getTypeDocument());
             }
             //signature de l'officier----------------------------------------------------
-            Integer officierId=demande.getMairie().getId();
-            byte[] signatureBytes = utilisateurService.getSignature(officierId);
-            Officier officier = officierRepository.findById(officierId).orElseThrow(() -> new RuntimeException("Officier not found"));
+            // Récupérer l'ID de la mairie depuis la demande
+            Integer mairieId = demande.getMairie().getId();
+
+// Trouver le premier officier lié à la mairie
+
+            Utilisateur officier = utilisateurRepository.findFirstByMairieId(mairieId)
+                    .orElseThrow(() -> new RuntimeException("Aucun officier trouvé pour cette mairie"));
+
+// Récupérer la signature de l'officier
+            byte[] signatureBytes = utilisateurService.getSignature(officier.getId());
 
             Image signatureImage = Image.getInstance(signatureBytes);
-            signatureImage.scaleToFit(150, 50); // Ajustez la taille de l'image si nécessaire
+            signatureImage.scaleToFit(250, 250); // Ajustez la taille de l'image si nécessaire
             signatureImage.setAlignment(Image.ALIGN_RIGHT);
             document.add(new Paragraph("\n"));
             document.add(signatureImage);
-            Paragraph officierName = new Paragraph("Officier de l'État-Civil : " + officier.getNom() + " " + officier.getPrenom(),titleFont);
+            Paragraph officierName = new Paragraph("Officier de l'État-Civil : " + officier.getNom() + " " + officier.getPrenom());
             officierName.setAlignment(Element.ALIGN_RIGHT);
             document.add(officierName);
+
+
            //-----------------------------------------------------------------------------
-            // Dans votre méthode generatePdf
-            PDFUtils.generatePdfWithQRCode(demande, documentInfos);
+            PDFUtils.addQRCodeWithDetails(document);
+
+            // Ajouter une image (signature) si nécessaire
+            String signaturePath = "src/main/resources/static/signature.png";
+            PDFUtils.addImageToPDF(document, signaturePath);
+
 
 
 
@@ -279,6 +308,8 @@ public class PdfService {
         } catch (DocumentException | IOException e) {
             e.printStackTrace();
             return null;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 }
